@@ -278,10 +278,16 @@ function formatAttachments(attachments: any[] | undefined): string {
     const type = a.type || 'file';
     const localPath = a.localPath ? `/workspace/${a.localPath}` : '';
     const url = a.url || '';
+    // Host-side speech-to-text (src/transcribe.ts) stamps `transcript` onto
+    // audio attachments. Rendering it inline is what lets a voice note be
+    // acted on at all — the model cannot open the .ogg itself, and a small
+    // local model cannot be relied on to call a transcription tool.
+    const transcript = typeof a.transcript === 'string' && a.transcript ? `\n  transcript: ${escapeXml(a.transcript)}` : '';
     if (localPath) {
-      return `[${type}: ${escapeXml(name)} — saved to ${escapeXml(localPath)}]`;
+      return `[${type}: ${escapeXml(name)} — saved to ${escapeXml(localPath)}]${transcript}`;
     }
-    return url ? `[${type}: ${escapeXml(name)} (${escapeXml(url)})]` : `[${type}: ${escapeXml(name)}]`;
+    const head = url ? `[${type}: ${escapeXml(name)} (${escapeXml(url)})]` : `[${type}: ${escapeXml(name)}]`;
+    return `${head}${transcript}`;
   });
   return '\n' + parts.join('\n');
 }

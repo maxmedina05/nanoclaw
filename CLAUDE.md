@@ -303,6 +303,7 @@ This project uses pnpm with `minimumReleaseAge: 4320` (3 days) in `pnpm-workspac
 | [docs/templates.md](docs/templates.md) | Agent templates: what they are, stamping via `ncl groups create --template` + the setup wizard, the OneCLI/MCP-credential model, supported providers, and how to contribute one |
 | [docs/hardened-image.md](docs/hardened-image.md) | Opt-in: pull the agent image from a registry instead of building it |
 | [docs/remote-mcp-servers.md](docs/remote-mcp-servers.md) | Adding an MCP server + host mount to an agent group: the four mount-validation rules, OAuth-protected remote servers via `mcp-remote`, headless authorization, and what actually verifies a working setup |
+| [docs/local-transcription.md](docs/local-transcription.md) | Local speech-to-text for voice notes: why it runs host-side, the fail-open contract, `.env` keys, the Speaches/GPU compose setup, and model choice under shared VRAM |
 
 ## Container Build Cache
 

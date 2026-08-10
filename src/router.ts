@@ -31,6 +31,7 @@ import { findSessionForAgent } from './db/sessions.js';
 import { startTypingRefresh, stopTypingRefresh } from './modules/typing/index.js';
 import { log } from './log.js';
 import { resolveSession, writeSessionMessage, writeOutboundDirect } from './session-manager.js';
+import { attachTranscripts } from './transcribe.js';
 import { wakeContainer } from './container-runner.js';
 import { getSession } from './db/sessions.js';
 import type { AgentGroup, MessagingGroup, MessagingGroupAgent } from './types.js';
@@ -504,6 +505,14 @@ async function deliverToAgent(
     }
   }
 
+  // Speech-to-text for voice notes, before the content is persisted. Awaited
+  // rather than fired-and-forgotten so the transcript lands in the same row
+  // the container will read — a late patch could miss the first poll. The
+  // call is fail-open and timeout-bounded (see transcribe.ts), so an
+  // unreachable backend costs at most WHISPER_TIMEOUT_MS and changes nothing
+  // else about routing.
+  const content = await attachTranscripts(event.message.content);
+
   writeSessionMessage(session.agent_group_id, session.id, {
     id: messageIdForAgent(event.message.id, agent.agent_group_id),
     kind: event.message.kind,
@@ -511,7 +520,7 @@ async function deliverToAgent(
     platformId: deliveryAddr.platformId,
     channelType: deliveryAddr.channelType,
     threadId: deliveryAddr.threadId,
-    content: event.message.content,
+    content,
     trigger: wake ? 1 : 0,
   });
 
