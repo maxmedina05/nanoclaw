@@ -59,10 +59,7 @@ describe('transcriptionEnabled', () => {
 
 describe('attachTranscripts', () => {
   it('stamps the transcript onto the attachment', async () => {
-    vi.stubGlobal(
-      'fetch',
-      vi.fn().mockResolvedValue({ ok: true, json: async () => ({ text: '  hola mundo  ' }) }),
-    );
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: true, json: async () => ({ text: '  hola mundo  ' }) }));
 
     const out = await attachTranscripts(withAudio());
     expect(JSON.parse(out).attachments[0].transcript).toBe('hola mundo');
