@@ -56,3 +56,4 @@ docs/maintainer-guide.md
 docs/drafts/
 forks.md
 .worktrees/
+tools/clidash/clidash.config.json
