@@ -81,11 +81,25 @@ export function findByRouting(
  * per-agent-group and changes when the operator renames an agent, while
  * the shared base is identical across all agents.
  */
-export function buildSystemPromptAddendum(assistantName?: string, mode: SessionMode = { kind: 'chat' }): string {
+export interface ModelInfo {
+  provider: string;
+  model?: string;
+}
+
+export function buildSystemPromptAddendum(
+  assistantName?: string,
+  mode: SessionMode = { kind: 'chat' },
+  modelInfo?: ModelInfo,
+): string {
   const sections: string[] = [];
 
   if (assistantName) {
     sections.push(['# You are ' + assistantName, '', `Your name is **${assistantName}**. Use it when the channel asks who you are, when introducing yourself, and when signing any message that explicitly calls for a signature.`].join('\n'));
+  }
+
+  if (modelInfo) {
+    const modelDesc = modelInfo.model ? `\`${modelInfo.model}\`` : `the ${modelInfo.provider} provider's default model`;
+    sections.push(['# Your model', '', `You are currently configured to run on ${modelDesc} (provider: \`${modelInfo.provider}\`). If asked what model or provider you're running on, answer with this — it reflects the live \`ncl groups config\` setting, not what you might otherwise assume about yourself. This is distinct from your name (${assistantName || 'unset'}), which is a separate persona identity.`].join('\n'));
   }
 
   sections.push(buildDestinationsSection(mode));

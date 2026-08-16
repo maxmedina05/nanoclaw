@@ -62,6 +62,7 @@ async function main(): Promise<void> {
   const instructions = buildSystemPromptAddendum(
     config.assistantName || undefined,
     taskId ? { kind: 'task', taskId } : { kind: 'chat' },
+    { provider: providerName, model: config.model },
   );
 
   // Discover additional directories mounted at /workspace/extra/*
