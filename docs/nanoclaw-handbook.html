@@ -1,0 +1,1645 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The NanoClaw Handbook</title>
+</head>
+<body>
+<style>
+/* ============================================================
+   The NanoClaw Handbook — design tokens
+   Type: Charter/Iowan serif headings · system sans body · mono utility
+   Color: cool paper + pine-teal accent + ochre caution (semantic only)
+   ============================================================ */
+:root{
+  --ground:#FAFAFB;
+  --surface:#F1F2F5;
+  --surface-2:#E8EAEF;
+  --line:#D7DBE2;
+  --line-soft:#E5E8ED;
+  --ink:#14181E;
+  --ink-2:#3B434E;
+  --muted:#6A7382;
+  --accent:#0D6E6A;
+  --accent-ink:#0A5A57;
+  --accent-soft:#E1EFED;
+  --caution:#9C4E10;
+  --caution-soft:#F7EDE1;
+  --good:#1E6B45;
+  --good-soft:#E2F0E9;
+  --code-bg:#F3F4F7;
+  --code-ink:#20262D;
+  --code-line:#E1E4EA;
+  --shadow:0 1px 2px rgba(20,24,30,.05), 0 8px 24px -16px rgba(20,24,30,.25);
+
+  --serif:"Iowan Old Style","Charter","Bitstream Charter","Source Serif 4","Palatino Linotype",Georgia,serif;
+  --sans:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --mono:ui-monospace,"SF Mono","JetBrains Mono","Cascadia Mono",Menlo,Consolas,monospace;
+
+  --measure:68ch;
+  --rail:272px;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --ground:#0D1015;
+    --surface:#141920;
+    --surface-2:#1B212A;
+    --line:#29313C;
+    --line-soft:#1E2530;
+    --ink:#E5E9EE;
+    --ink-2:#BBC3CD;
+    --muted:#87909C;
+    --accent:#5AC5B6;
+    --accent-ink:#7FD6C9;
+    --accent-soft:#102A28;
+    --caution:#DE9457;
+    --caution-soft:#2A1E13;
+    --good:#63C093;
+    --good-soft:#12251C;
+    --code-bg:#11161D;
+    --code-ink:#D5DBE3;
+    --code-line:#232B35;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 30px -18px rgba(0,0,0,.8);
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#0D1015;
+  --surface:#141920;
+  --surface-2:#1B212A;
+  --line:#29313C;
+  --line-soft:#1E2530;
+  --ink:#E5E9EE;
+  --ink-2:#BBC3CD;
+  --muted:#87909C;
+  --accent:#5AC5B6;
+  --accent-ink:#7FD6C9;
+  --accent-soft:#102A28;
+  --caution:#DE9457;
+  --caution-soft:#2A1E13;
+  --good:#63C093;
+  --good-soft:#12251C;
+  --code-bg:#11161D;
+  --code-ink:#D5DBE3;
+  --code-line:#232B35;
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 30px -18px rgba(0,0,0,.8);
+}
+
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:1.5rem}
+@media (prefers-reduced-motion: reduce){html{scroll-behavior:auto}*{animation:none!important;transition:none!important}}
+
+body{
+  margin:0;
+  background:var(--ground);
+  color:var(--ink);
+  font-family:var(--sans);
+  font-size:16px;
+  line-height:1.62;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* ---------- shell ---------- */
+.shell{display:block;max-width:1400px;margin:0 auto}
+@media (min-width:1040px){
+  .shell{display:grid;grid-template-columns:var(--rail) minmax(0,1fr);gap:0;align-items:start}
+}
+
+/* ---------- rail ---------- */
+.rail{
+  border-right:1px solid var(--line-soft);
+  padding:1.75rem 1.25rem 3rem 1.5rem;
+  background:var(--ground);
+}
+@media (min-width:1040px){
+  .rail{position:sticky;top:0;max-height:100vh;overflow-y:auto}
+}
+.rail-brand{display:flex;flex-direction:column;gap:.15rem;margin-bottom:1.5rem;text-decoration:none}
+.rail-brand b{font-family:var(--serif);font-size:1.18rem;font-weight:600;color:var(--ink);letter-spacing:-.01em}
+.rail-brand span{font-family:var(--mono);font-size:.66rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.rail nav ol{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:.05rem}
+.rail nav a{
+  display:flex;gap:.6rem;align-items:baseline;
+  padding:.3rem .5rem;border-radius:5px;
+  text-decoration:none;color:var(--ink-2);font-size:.845rem;line-height:1.35;
+}
+.rail nav a .n{font-family:var(--mono);font-size:.68rem;color:var(--muted);letter-spacing:.04em;flex:none;padding-top:.12em}
+.rail nav a:hover{background:var(--surface);color:var(--ink)}
+.rail nav a.on{background:var(--accent-soft);color:var(--accent-ink);font-weight:600}
+.rail nav a.on .n{color:var(--accent)}
+.rail nav a:focus-visible,.rail-brand:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+/* ---------- main ---------- */
+main{padding:2.25rem 1.5rem 6rem;min-width:0}
+@media (min-width:760px){main{padding:3rem 3rem 7rem}}
+.wrap{max-width:920px;margin:0 auto}
+p,ul,ol,dl{max-width:var(--measure)}
+p{margin:0 0 1rem}
+a{color:var(--accent-ink);text-underline-offset:2px;text-decoration-thickness:1px}
+a:hover{color:var(--accent)}
+a:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:2px}
+
+/* ---------- masthead ---------- */
+.mast{border-bottom:1px solid var(--line);padding-bottom:2.25rem;margin-bottom:2.75rem}
+.eyebrow{font-family:var(--mono);font-size:.7rem;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);margin:0 0 .9rem}
+h1{
+  font-family:var(--serif);font-weight:600;letter-spacing:-.02em;
+  font-size:clamp(2.1rem,5.2vw,3.35rem);line-height:1.06;margin:0 0 1rem;text-wrap:balance;
+}
+.lede{font-size:1.09rem;color:var(--ink-2);max-width:60ch;margin:0 0 1.5rem}
+.mast-meta{display:flex;flex-wrap:wrap;gap:.45rem;font-family:var(--mono);font-size:.72rem}
+.mast-meta span{
+  border:1px solid var(--line);border-radius:99px;padding:.24rem .7rem;
+  color:var(--muted);background:var(--surface);
+}
+
+/* ---------- sections ---------- */
+section{scroll-margin-top:1.5rem;padding-top:2.5rem}
+section + section{margin-top:1rem}
+h2{
+  font-family:var(--serif);font-weight:600;letter-spacing:-.015em;
+  font-size:clamp(1.55rem,3vw,2.05rem);line-height:1.15;margin:0 0 .35rem;text-wrap:balance;
+}
+.h2-num{font-family:var(--mono);font-size:.7rem;letter-spacing:.16em;color:var(--accent);display:block;margin-bottom:.5rem;text-transform:uppercase}
+.h2-sub{color:var(--muted);font-size:.98rem;max-width:62ch;margin:0 0 1.6rem}
+h3{font-family:var(--sans);font-size:1.06rem;font-weight:660;letter-spacing:-.005em;margin:2.1rem 0 .55rem;color:var(--ink)}
+h4{font-family:var(--mono);font-size:.76rem;letter-spacing:.11em;text-transform:uppercase;color:var(--muted);margin:1.6rem 0 .5rem;font-weight:600}
+ul,ol{padding-left:1.15rem;margin:0 0 1rem}
+li{margin-bottom:.35rem}
+li::marker{color:var(--muted)}
+strong{font-weight:650;color:var(--ink)}
+hr{border:0;border-top:1px solid var(--line-soft);margin:2.5rem 0}
+
+/* ---------- code ---------- */
+code{
+  font-family:var(--mono);font-size:.855em;
+  background:var(--surface);border:1px solid var(--line-soft);
+  padding:.08em .34em;border-radius:4px;color:var(--ink);
+  white-space:nowrap;
+}
+pre{
+  background:var(--code-bg);border:1px solid var(--code-line);border-radius:8px;
+  padding:.95rem 1.1rem;overflow-x:auto;margin:0 0 1.15rem;
+  font-family:var(--mono);font-size:.815rem;line-height:1.62;color:var(--code-ink);
+}
+pre code{background:none;border:0;padding:0;font-size:inherit;color:inherit;white-space:pre}
+pre .c{color:var(--muted)}
+pre .k{color:var(--accent-ink);font-weight:600}
+.pre-label{
+  font-family:var(--mono);font-size:.66rem;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--muted);margin:0 0 .35rem;display:block;
+}
+
+/* ---------- callouts ---------- */
+.note,.warn,.tip{
+  border:1px solid var(--line);border-left-width:3px;border-radius:6px;
+  padding:.85rem 1.05rem;margin:0 0 1.25rem;max-width:var(--measure);
+  font-size:.93rem;background:var(--surface);
+}
+.note{border-left-color:var(--accent);background:var(--accent-soft)}
+.warn{border-left-color:var(--caution);background:var(--caution-soft)}
+.tip{border-left-color:var(--good);background:var(--good-soft)}
+.note :last-child,.warn :last-child,.tip :last-child{margin-bottom:0}
+.note b,.warn b,.tip b{display:block;font-family:var(--mono);font-size:.68rem;letter-spacing:.11em;text-transform:uppercase;margin-bottom:.3rem}
+.note b{color:var(--accent-ink)}
+.warn b{color:var(--caution)}
+.tip b{color:var(--good)}
+
+/* ---------- tables ---------- */
+.tbl{overflow-x:auto;margin:0 0 1.4rem;border:1px solid var(--line);border-radius:8px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-size:.875rem;min-width:520px}
+thead th{
+  text-align:left;font-family:var(--mono);font-size:.67rem;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--muted);font-weight:600;padding:.6rem .85rem;border-bottom:1px solid var(--line);
+  background:var(--surface-2);white-space:nowrap;
+}
+tbody td{padding:.62rem .85rem;border-bottom:1px solid var(--line-soft);vertical-align:top;color:var(--ink-2);background:var(--ground)}
+tbody tr:last-child td{border-bottom:0}
+tbody td:first-child{color:var(--ink)}
+td code,th code{white-space:nowrap}
+.num{font-variant-numeric:tabular-nums}
+
+/* ---------- cards ---------- */
+.grid{display:grid;gap:.85rem;margin:0 0 1.5rem}
+@media (min-width:680px){.grid.c2{grid-template-columns:1fr 1fr}.grid.c3{grid-template-columns:repeat(3,1fr)}}
+.card{
+  border:1px solid var(--line);border-radius:8px;padding:1rem 1.1rem;background:var(--surface);
+}
+.card h5{margin:0 0 .4rem;font-size:.95rem;font-weight:650;color:var(--ink);font-family:var(--sans)}
+.card p{margin:0;font-size:.885rem;color:var(--ink-2);max-width:none}
+.card .kicker{font-family:var(--mono);font-size:.65rem;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);display:block;margin-bottom:.45rem}
+
+/* two-column compare */
+.compare{display:grid;gap:.85rem;margin:0 0 1.5rem}
+@media (min-width:720px){.compare{grid-template-columns:1fr 1fr}}
+.compare > div{border:1px solid var(--line);border-radius:8px;padding:1rem 1.1rem;background:var(--ground)}
+.compare .yes{border-top:3px solid var(--good)}
+.compare .no{border-top:3px solid var(--caution)}
+.compare h5{margin:0 0 .6rem;font-family:var(--mono);font-size:.7rem;letter-spacing:.11em;text-transform:uppercase}
+.compare .yes h5{color:var(--good)}
+.compare .no h5{color:var(--caution)}
+.compare ul{margin:0;padding-left:1.05rem;font-size:.9rem;max-width:none}
+
+/* pills */
+.pill{
+  display:inline-block;font-family:var(--mono);font-size:.66rem;letter-spacing:.06em;
+  padding:.13rem .48rem;border-radius:4px;border:1px solid var(--line);
+  background:var(--surface);color:var(--muted);white-space:nowrap;vertical-align:middle;
+}
+.pill.approval{background:var(--caution-soft);border-color:var(--caution);color:var(--caution)}
+.pill.open{background:var(--good-soft);border-color:var(--good);color:var(--good)}
+.pill.host{background:var(--accent-soft);border-color:var(--accent);color:var(--accent-ink)}
+
+/* diagram */
+figure{margin:0 0 1.5rem}
+figure svg{width:100%;height:auto;display:block;border:1px solid var(--line);border-radius:8px;background:var(--surface)}
+figcaption{font-size:.8rem;color:var(--muted);margin-top:.5rem;font-family:var(--mono);letter-spacing:.02em}
+
+/* command filter */
+.filter{
+  display:flex;gap:.6rem;align-items:center;margin:0 0 1rem;flex-wrap:wrap;
+}
+.filter input{
+  flex:1 1 260px;font-family:var(--mono);font-size:.82rem;
+  padding:.5rem .75rem;border-radius:6px;border:1px solid var(--line);
+  background:var(--ground);color:var(--ink);
+}
+.filter input:focus{outline:2px solid var(--accent);outline-offset:1px;border-color:var(--accent)}
+.filter .count{font-family:var(--mono);font-size:.72rem;color:var(--muted);font-variant-numeric:tabular-nums}
+tr.hidden{display:none}
+.noresult{padding:1rem;font-size:.88rem;color:var(--muted);display:none}
+.noresult.show{display:block}
+
+/* footer */
+footer{margin-top:4rem;padding-top:1.75rem;border-top:1px solid var(--line);font-size:.85rem;color:var(--muted)}
+footer a{color:var(--accent-ink)}
+.skip{position:absolute;left:-9999px}
+.skip:focus{left:1rem;top:1rem;z-index:9;background:var(--ground);padding:.5rem .8rem;border:1px solid var(--accent);border-radius:6px}
+</style>
+
+<a class="skip" href="#top">Skip to content</a>
+
+<div class="shell">
+
+<aside class="rail">
+  <a class="rail-brand" href="#top">
+    <b>NanoClaw</b>
+    <span>Operator Handbook</span>
+  </a>
+  <nav aria-label="Contents">
+    <ol>
+      <li><a href="#what"><span class="n">01</span> What it is</a></li>
+      <li><a href="#vs"><span class="n">02</span> vs. Claude &amp; Claude Code</a></li>
+      <li><a href="#fit"><span class="n">03</span> Good fit / bad fit</a></li>
+      <li><a href="#install"><span class="n">04</span> Install from the terminal</a></li>
+      <li><a href="#channels"><span class="n">05</span> Channels &amp; isolation</a></li>
+      <li><a href="#personality"><span class="n">06</span> Personality &amp; memory</a></li>
+      <li><a href="#agents"><span class="n">07</span> Sub-agents &amp; multi-agent</a></li>
+      <li><a href="#tasks"><span class="n">08</span> Scheduled tasks</a></li>
+      <li><a href="#mcp"><span class="n">09</span> MCP servers &amp; OAuth</a></li>
+      <li><a href="#people"><span class="n">10</span> Onboarding people</a></li>
+      <li><a href="#ncl"><span class="n">11</span> The <code>ncl</code> reference</a></li>
+      <li><a href="#ops"><span class="n">12</span> Operations &amp; debugging</a></li>
+      <li><a href="#usecases"><span class="n">13</span> Use cases in the wild</a></li>
+      <li><a href="#appendix"><span class="n">14</span> Appendix</a></li>
+    </ol>
+  </nav>
+</aside>
+
+<main id="top">
+<div class="wrap">
+
+<header class="mast">
+  <p class="eyebrow">Complete reference · v2</p>
+  <h1>The NanoClaw Handbook</h1>
+  <p class="lede">Everything needed to install NanoClaw from a terminal, wire it to your messaging apps, give it a personality and a memory, schedule its work, extend it with MCP tools and credentials, and run it day to day.</p>
+  <div class="mast-meta">
+    <span>host: node + pnpm</span>
+    <span>agents: docker + bun</span>
+    <span>cli: ncl</span>
+    <span>license: MIT</span>
+  </div>
+</header>
+
+<!-- ============================== 01 ============================== -->
+<section id="what">
+  <span class="h2-num">Part 01</span>
+  <h2>What NanoClaw actually is</h2>
+  <p class="h2-sub">A single small Node process on your machine that orchestrates one Linux container per conversation, each running a Claude (or Codex, OpenCode, Ollama) agent.</p>
+
+  <p>NanoClaw is a personal AI assistant you host yourself. You talk to it from WhatsApp, Telegram, Discord, Slack, iMessage, Teams, Matrix, email, or your terminal. Behind each conversation is a Docker container running an agent that can read files, run shell commands, browse the web, call APIs, and write back to you.</p>
+
+  <p>The design bet is <strong>isolation over permission checks</strong>. The agent has full <code>bash</code> inside its container, which is safe because the container only sees what you explicitly mounted. There is no allowlist of "safe commands" to get wrong.</p>
+
+  <h3>The one thing to understand: everything is a message</h3>
+  <p>There is no IPC, no file watcher, no stdin piping between the host and a container. Each session owns exactly two SQLite files, and each file has exactly one writer.</p>
+
+  <figure>
+    <svg viewBox="0 0 900 300" role="img" aria-labelledby="pipe-title">
+      <title id="pipe-title">Message pipeline: chat app to host router to inbound database to container agent to outbound database to host delivery and back to the chat app</title>
+      <defs>
+        <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+          <path d="M0 0 L10 5 L0 10 z" fill="currentColor"/>
+        </marker>
+      </defs>
+      <g style="color:var(--muted)" fill="none" stroke="currentColor" stroke-width="1.4">
+        <line x1="152" y1="70" x2="222" y2="70" marker-end="url(#ar)"/>
+        <line x1="352" y1="70" x2="422" y2="70" marker-end="url(#ar)"/>
+        <line x1="490" y1="98" x2="490" y2="150" marker-end="url(#ar)"/>
+        <line x1="422" y1="230" x2="352" y2="230" marker-end="url(#ar)"/>
+        <line x1="222" y1="230" x2="152" y2="230" marker-end="url(#ar)"/>
+        <line x1="80" y1="98" x2="80" y2="202" marker-end="url(#ar)" stroke-dasharray="3 4"/>
+      </g>
+      <g font-family="ui-monospace, SF Mono, Menlo, monospace" font-size="12">
+        <g>
+          <rect x="16" y="46" width="136" height="48" rx="7" fill="var(--surface-2)" stroke="var(--line)"/>
+          <text x="84" y="68" text-anchor="middle" fill="var(--ink)">chat app</text>
+          <text x="84" y="84" text-anchor="middle" fill="var(--muted)" font-size="10">telegram · slack…</text>
+        </g>
+        <g>
+          <rect x="222" y="46" width="130" height="48" rx="7" fill="var(--surface-2)" stroke="var(--line)"/>
+          <text x="287" y="68" text-anchor="middle" fill="var(--ink)">router.ts</text>
+          <text x="287" y="84" text-anchor="middle" fill="var(--muted)" font-size="10">host process</text>
+        </g>
+        <g>
+          <rect x="422" y="46" width="136" height="48" rx="7" fill="var(--accent-soft)" stroke="var(--accent)"/>
+          <text x="490" y="68" text-anchor="middle" fill="var(--accent-ink)">inbound.db</text>
+          <text x="490" y="84" text-anchor="middle" fill="var(--accent-ink)" font-size="10">host writes</text>
+        </g>
+        <g>
+          <rect x="392" y="150" width="196" height="52" rx="7" fill="var(--surface-2)" stroke="var(--line)" stroke-width="1.6"/>
+          <text x="490" y="172" text-anchor="middle" fill="var(--ink)">container (bun)</text>
+          <text x="490" y="188" text-anchor="middle" fill="var(--muted)" font-size="10">agent-runner · agent sdk</text>
+        </g>
+        <g>
+          <rect x="422" y="206" width="136" height="48" rx="7" fill="var(--accent-soft)" stroke="var(--accent)"/>
+          <text x="490" y="228" text-anchor="middle" fill="var(--accent-ink)">outbound.db</text>
+          <text x="490" y="244" text-anchor="middle" fill="var(--accent-ink)" font-size="10">container writes</text>
+        </g>
+        <g>
+          <rect x="222" y="206" width="130" height="48" rx="7" fill="var(--surface-2)" stroke="var(--line)"/>
+          <text x="287" y="228" text-anchor="middle" fill="var(--ink)">delivery.ts</text>
+          <text x="287" y="244" text-anchor="middle" fill="var(--muted)" font-size="10">host process</text>
+        </g>
+        <g>
+          <rect x="16" y="206" width="136" height="48" rx="7" fill="var(--surface-2)" stroke="var(--line)"/>
+          <text x="84" y="234" text-anchor="middle" fill="var(--ink)">you</text>
+        </g>
+        <g>
+          <rect x="640" y="46" width="244" height="208" rx="7" fill="var(--ground)" stroke="var(--line)" stroke-dasharray="4 4"/>
+          <text x="762" y="72" text-anchor="middle" fill="var(--muted)" font-size="10">ALSO RUNNING ON THE HOST</text>
+          <text x="762" y="100" text-anchor="middle" fill="var(--ink)">host-sweep.ts</text>
+          <text x="762" y="116" text-anchor="middle" fill="var(--muted)" font-size="10">60s · due tasks, stale sessions</text>
+          <text x="762" y="146" text-anchor="middle" fill="var(--ink)">data/v2.db</text>
+          <text x="762" y="162" text-anchor="middle" fill="var(--muted)" font-size="10">users · groups · wirings · roles</text>
+          <text x="762" y="192" text-anchor="middle" fill="var(--ink)">OneCLI Agent Vault</text>
+          <text x="762" y="208" text-anchor="middle" fill="var(--muted)" font-size="10">credential injection proxy</text>
+          <text x="762" y="238" text-anchor="middle" fill="var(--ink)">ncl socket</text>
+        </g>
+      </g>
+    </svg>
+    <figcaption>One message, end to end. The two session databases are the only IO surface between host and container.</figcaption>
+  </figure>
+
+  <h3>The entity model</h3>
+  <p>Four nouns explain nearly every configuration question.</p>
+
+  <div class="tbl">
+  <table>
+    <thead><tr><th>Entity</th><th>What it is</th><th>Example</th></tr></thead>
+    <tbody>
+      <tr><td><strong>User</strong></td><td>One identity on one platform, id <code>&lt;channel&gt;:&lt;handle&gt;</code></td><td><code>telegram:6037840640</code></td></tr>
+      <tr><td><strong>Messaging group</strong></td><td>One chat or channel on one platform</td><td>Your Telegram DM; a Discord channel</td></tr>
+      <tr><td><strong>Agent group</strong></td><td>An agent identity: its own workspace folder, memory, personality, container config</td><td><code>groups/andy/</code></td></tr>
+      <tr><td><strong>Wiring</strong></td><td>Links a messaging group to an agent group and sets when it engages</td><td>"this Slack channel → the Work agent, on @mention"</td></tr>
+      <tr><td><strong>Session</strong></td><td>Runtime unit: one (agent group, messaging group, thread) → one container + two DBs</td><td>Created automatically by the router</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <p>Privilege is attached to <em>users</em>, not agent groups. A user is an <code>owner</code> (global, full control), an <code>admin</code> (global or scoped to one agent group), a plain <code>member</code> of an agent group, or unknown.</p>
+
+  <h3>Where things live on disk</h3>
+  <div class="tbl">
+  <table>
+    <thead><tr><th>Path</th><th>Contents</th></tr></thead>
+    <tbody>
+      <tr><td><code>data/v2.db</code></td><td>Central DB: users, roles, agent groups, messaging groups, wirings, container configs, approvals</td></tr>
+      <tr><td><code>data/v2-sessions/&lt;group&gt;/&lt;session&gt;/</code></td><td><code>inbound.db</code> + <code>outbound.db</code> for one session</td></tr>
+      <tr><td><code>groups/&lt;folder&gt;/</code></td><td>An agent's workspace: <code>instructions.prepend.md</code>, <code>memory/</code>, <code>skills/</code>, <code>tasks/</code>, generated <code>CLAUDE.md</code></td></tr>
+      <tr><td><code>logs/nanoclaw.log</code>, <code>logs/nanoclaw.error.log</code></td><td>Host logs — check the error log first</td></tr>
+      <tr><td><code>logs/setup.log</code>, <code>logs/setup-steps/*.log</code></td><td>Install progression log and raw per-step output</td></tr>
+      <tr><td><code>~/.config/nanoclaw/mount-allowlist.json</code></td><td>Which host directories may ever be mounted into a container. Deliberately outside the repo.</td></tr>
+      <tr><td><code>templates/</code></td><td>Local agent template library (ships empty)</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <p>Inside a container, the session folder is mounted at <code>/workspace</code> and the agent group folder at <code>/workspace/agent</code>.</p>
+</section>
+
+<!-- ============================== 02 ============================== -->
+<section id="vs">
+  <span class="h2-num">Part 02</span>
+  <h2>How this differs from just using Claude</h2>
+  <p class="h2-sub">Claude and Claude Code are things you open. NanoClaw is something that is already running.</p>
+
+  <p>NanoClaw uses the same underlying model and, by default, the same harness — it calls Claude through Anthropic's official Claude Agent SDK, so the agent has Claude Code's full toolset. The difference is not intelligence. It is <em>persistence, reach, and autonomy</em>.</p>
+
+  <div class="tbl">
+  <table>
+    <thead><tr><th>Capability</th><th>Claude app</th><th>Claude Code</th><th>NanoClaw</th></tr></thead>
+    <tbody>
+      <tr><td>Runs when you are not present</td><td>No</td><td>No</td><td><strong>Yes</strong> — background service</td></tr>
+      <tr><td>Reachable from WhatsApp / Telegram / Slack</td><td>No</td><td>No</td><td><strong>Yes</strong> — 17+ channel adapters</td></tr>
+      <tr><td>Cron-scheduled work with run history</td><td>No</td><td>No</td><td><strong>Yes</strong> — <code>ncl tasks</code></td></tr>
+      <tr><td>Memory that survives every session, forever</td><td>Partial</td><td>Project files only</td><td><strong>Yes</strong> — file-based <code>memory/</code> tree</td></tr>
+      <tr><td>Spawns other persistent agents that message it back</td><td>No</td><td>Sub-agents die with the turn</td><td><strong>Yes</strong> — <code>create_agent</code></td></tr>
+      <tr><td>Shell access</td><td>No</td><td>Your machine</td><td>Its container only</td></tr>
+      <tr><td>Credentials for third-party APIs</td><td>Connectors</td><td>Your env</td><td>Injected at an HTTPS proxy; never in the container</td></tr>
+      <tr><td>Modifies its own capabilities</td><td>No</td><td>Manually</td><td><strong>Yes</strong> — approval-gated self-modification</td></tr>
+      <tr><td>Serves multiple people with separate memory</td><td>No</td><td>No</td><td><strong>Yes</strong> — per-agent-group isolation</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3>What NanoClaw can do that Claude cannot do alone</h3>
+  <ul>
+    <li><strong>Initiate.</strong> A scheduled task can wake at 06:00, gather data, decide nothing is worth reporting, and go back to sleep without costing a token — or decide it <em>is</em> worth reporting and text you.</li>
+    <li><strong>Live in the channel you already use.</strong> No new app. Your assistant is a contact in WhatsApp or a bot in your team's Slack.</li>
+    <li><strong>Accumulate a real institutional memory.</strong> Facts you tell it in March are in <code>memory/</code> in November, as plain Markdown you can read and correct yourself.</li>
+    <li><strong>Fan out.</strong> Your main agent can create a <code>Researcher</code> that works for an hour and reports back while you keep chatting.</li>
+    <li><strong>Hold credentials it cannot read.</strong> The agent calls <code>https://api.github.com/...</code> and the proxy attaches auth. A prompt injection cannot exfiltrate a key the container never held.</li>
+    <li><strong>Be edited.</strong> The codebase is small enough that "add this behavior" is a real answer, not a feature request.</li>
+  </ul>
+
+  <div class="note">
+    <b>The trade</b>
+    <p>You are now an operator. Something on your machine is running unattended with network access and shell access inside a sandbox. That is the whole value and the whole risk. Part 12 covers what to watch.</p>
+  </div>
+</section>
+
+<!-- ============================== 03 ============================== -->
+<section id="fit">
+  <span class="h2-num">Part 03</span>
+  <h2>What it is good for — and what it is not</h2>
+  <p class="h2-sub">Be honest with yourself here; it saves a weekend.</p>
+
+  <div class="compare">
+    <div class="yes">
+      <h5>Good fit</h5>
+      <ul>
+        <li><strong>A personal assistant you own.</strong> Briefings, reminders, research, drafting — reachable from your phone's messaging app.</li>
+        <li><strong>Recurring, gated monitoring.</strong> "Watch this feed / API / repo and only bother me when something changes."</li>
+        <li><strong>Long-horizon knowledge work.</strong> Anything where remembering last month's decision matters more than raw speed.</li>
+        <li><strong>Small-team ops bots.</strong> One agent in a Slack channel with its own workspace and access list.</li>
+        <li><strong>Privacy-sensitive work.</strong> Nothing leaves your machine except the model calls and the APIs you point it at.</li>
+        <li><strong>Agentic coding on a schedule.</strong> "Review the week's commits every Friday and update the README if it drifted."</li>
+        <li><strong>Learning how agent systems work.</strong> The codebase is genuinely readable end to end.</li>
+      </ul>
+    </div>
+    <div class="no">
+      <h5>Bad fit</h5>
+      <ul>
+        <li><strong>Multi-tenant SaaS.</strong> There are no accounts, no billing, no tenancy model. It is single-operator software.</li>
+        <li><strong>Sub-second latency.</strong> A container spawn plus a model turn is seconds, not milliseconds. It is not a chatbot widget.</li>
+        <li><strong>High-frequency polling.</strong> Ungated recurring tasks are capped at four fires a day by design. Frequent work needs a script gate.</li>
+        <li><strong>A no-code product.</strong> Customization means editing code. That is the stated philosophy, not a gap.</li>
+        <li><strong>Zero-maintenance appliance.</strong> Docker, a background service, and upstream updates are yours to manage.</li>
+        <li><strong>Untrusted public exposure.</strong> Wiring an agent to a public channel with <code>unknown_sender_policy: public</code> means strangers drive an agent that holds your context.</li>
+        <li><strong>Deterministic pipelines.</strong> If the answer must be identical every run, write a script and let the agent call it.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ============================== 04 ============================== -->
+<section id="install">
+  <span class="h2-num">Part 04</span>
+  <h2>Install it from the terminal</h2>
+  <p class="h2-sub">One script takes a bare machine to a named agent you can message.</p>
+
+  <h4>Requirements</h4>
+  <ul>
+    <li>macOS or Linux (Windows via WSL2)</li>
+    <li>Node.js 20+ and pnpm 10+ — the installer installs both if missing</li>
+    <li>Docker Desktop (macOS/Windows) or Docker Engine (Linux)</li>
+    <li>Claude Code on the host, for <code>/customize</code>, <code>/debug</code>, the <code>/add-&lt;channel&gt;</code> skills, and automatic error recovery during setup</li>
+  </ul>
+
+  <h4>The whole install</h4>
+<pre><code><span class="c"># Clone and run. That is the install.</span>
+git clone https://github.com/nanocoai/nanoclaw.git nanoclaw-v2
+<span class="k">cd</span> nanoclaw-v2
+bash nanoclaw.sh</code></pre>
+
+  <p><code>nanoclaw.sh</code> runs in two phases. Phase 1 bootstraps the toolchain (Node, pnpm, native module verification). Phase 2 is the interactive wizard: Docker check, Anthropic credential registration, agent image build, OneCLI vault install, mount allowlist, background service, timezone, and your first channel.</p>
+
+  <p>If a step fails, the script hands off to Claude Code to diagnose and resume from the break. Every step writes three levels of output: a clean summary in your terminal, a structured entry in <code>logs/setup.log</code>, and raw verbatim output in <code>logs/setup-steps/NN-step.log</code>.</p>
+
+  <div class="note">
+    <b>The one interactive break</b>
+    <p>Anthropic credential registration hands the terminal to <code>claude setup-token</code>, which opens your browser for OAuth. This is the only step that breaks the wizard's visual flow, and deliberately so — NanoClaw does not re-implement or intercept the device flow. Your token goes into the OneCLI vault, never into the container.</p>
+  </div>
+
+  <h3>Talk to it from the terminal first</h3>
+  <p>Setup offers to create a terminal agent so you can verify everything works before pairing a phone.</p>
+<pre><code><span class="c"># Send a message to your CLI-wired agent and print the reply</span>
+pnpm run chat hi
+
+<span class="c"># If you skipped it during setup, create the CLI agent by hand</span>
+pnpm exec tsx scripts/init-cli-agent.ts --display-name <span class="k">"Max"</span> --agent-name <span class="k">"Max's Terminal"</span></code></pre>
+
+  <h3>Running the service</h3>
+<pre><code><span class="c"># macOS (launchd)</span>
+launchctl load   ~/Library/LaunchAgents/com.nanoclaw.plist
+launchctl unload ~/Library/LaunchAgents/com.nanoclaw.plist
+launchctl kickstart -k gui/$(id -u)/com.nanoclaw   <span class="c"># restart</span>
+
+<span class="c"># Linux (systemd, user unit)</span>
+systemctl --user start nanoclaw
+systemctl --user restart nanoclaw
+systemctl --user stop nanoclaw
+
+<span class="c"># Foreground, for development</span>
+pnpm run dev</code></pre>
+
+  <h3>Rebuilding the agent image</h3>
+<pre><code>./container/build.sh</code></pre>
+  <p>The buildkit caches the build context aggressively. <code>--no-cache</code> alone does <em>not</em> invalidate <code>COPY</code> steps — prune the builder first if you need a genuinely clean rebuild.</p>
+
+  <h3>Uninstalling</h3>
+<pre><code>bash nanoclaw.sh --uninstall             <span class="c"># interactive, confirms per group</span>
+bash nanoclaw.sh --uninstall --dry-run   <span class="c"># preview only, changes nothing</span>
+bash nanoclaw.sh --uninstall --yes       <span class="c"># skip prompts</span></code></pre>
+  <p>Every install is tagged with a per-checkout id, so the uninstaller removes only that copy: its service, containers and image, <code>data/</code>, <code>logs/</code>, <code>groups/</code>, and that copy's OneCLI vault agents. The shared OneCLI app, your stored credentials, and any other NanoClaw checkout on the machine are left alone. Your <code>.env</code> is backed up first. Delete the checkout folder yourself to finish.</p>
+
+  <h3>Migrating from v1</h3>
+<pre><code>git clone https://github.com/nanocoai/nanoclaw.git nanoclaw-v2
+<span class="k">cd</span> nanoclaw-v2
+bash migrate-v2.sh</code></pre>
+  <div class="warn">
+    <b>Do not merge v2 into a v1 checkout</b>
+    <p>v2 is a ground-up rewrite. <code>git pull</code> into a v1 install produces conflicts that cannot be hand-resolved into a working system. Run <code>migrate-v2.sh</code> from a fresh clone, from a real shell — it needs interactive prompts and cannot run from inside a Claude Code session. It migrates state and leaves your v1 install untouched until you choose to switch the service over.</p>
+  </div>
+</section>
+
+<!-- ============================== 05 ============================== -->
+<section id="channels">
+  <span class="h2-num">Part 05</span>
+  <h2>Channels and the isolation decision</h2>
+  <p class="h2-sub">Trunk ships no channel adapters. You install exactly the ones you want.</p>
+
+  <p>The codebase is the registry and infrastructure; the actual adapters live on a long-lived <code>channels</code> branch. Each <code>/add-&lt;channel&gt;</code> skill fetches that branch, copies the module in, wires its self-registration import, pins the dependency, and rebuilds. It is idempotent — safe to re-run.</p>
+
+  <h4>Available channels</h4>
+  <p>Run these from Claude Code inside your checkout:</p>
+  <div class="tbl">
+  <table>
+    <thead><tr><th>Skill</th><th>Channel</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td><code>/add-whatsapp</code></td><td>WhatsApp</td><td>Native Baileys adapter; QR or pairing code</td></tr>
+      <tr><td><code>/add-telegram</code></td><td>Telegram</td><td>Bot token</td></tr>
+      <tr><td><code>/add-discord</code></td><td>Discord</td><td>Bot application</td></tr>
+      <tr><td><code>/add-slack</code></td><td>Slack</td><td>OAuth app</td></tr>
+      <tr><td><code>/add-imessage</code></td><td>iMessage</td><td>Local Mac (<code>chat.db</code>, Full Disk Access) or hosted via photon.codes</td></tr>
+      <tr><td><code>/add-teams</code></td><td>Microsoft Teams</td><td>App manifest build included</td></tr>
+      <tr><td><code>/add-signal</code></td><td>Signal</td><td>signal-cli device link</td></tr>
+      <tr><td><code>/add-matrix</code></td><td>Matrix</td><td>Any homeserver</td></tr>
+      <tr><td><code>/add-gchat</code></td><td>Google Chat</td><td></td></tr>
+      <tr><td><code>/add-webex</code></td><td>Webex</td><td></td></tr>
+      <tr><td><code>/add-wechat</code></td><td>WeChat</td><td>Official iLink Bot API, long-polling + QR</td></tr>
+      <tr><td><code>/add-deltachat</code></td><td>DeltaChat</td><td>Email-based, end-to-end encrypted</td></tr>
+      <tr><td><code>/add-whatsapp-cloud</code></td><td>WhatsApp Business</td><td>Official Meta Cloud API</td></tr>
+      <tr><td><code>/add-resend</code></td><td>Email</td><td>Send and receive via Resend</td></tr>
+      <tr><td><code>/add-github</code></td><td>GitHub</td><td>PR and issue comment threads as conversations</td></tr>
+      <tr><td><code>/add-linear</code></td><td>Linear</td><td>Issue comment threads as conversations</td></tr>
+      <tr><td><code>/add-emacs</code></td><td>Emacs</td><td>Local HTTP bridge; no bot token</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3>Wiring a channel to an agent</h3>
+  <p>The guided path is <code>/manage-channels</code>, which walks the isolation decision with you. The direct path:</p>
+<pre><code><span class="c"># 1. Register the chat (usually created automatically on first message)</span>
+ncl messaging-groups create --channel-type telegram --platform-id 6037840640 \
+  --name <span class="k">"Max DM"</span> --is-group 0
+
+<span class="c"># 2. Wire it to an agent group — by folder name, no id lookup needed</span>
+ncl wirings create --channel-type telegram --platform-id 6037840640 \
+  --agent-group andy --session-mode shared --engage-mode mention</code></pre>
+
+  <p>Omitted engagement flags default to whatever the channel adapter declares for that context (DM vs group chat). You override per wiring at creation; there is no per-instance config table.</p>
+
+  <h3>Choosing an isolation level</h3>
+  <p>The question that decides it: <strong>are you okay with any piece of information from one channel being available in the other?</strong></p>
+
+  <div class="grid c3">
+    <div class="card">
+      <span class="kicker">Level 1</span>
+      <h5>Shared session</h5>
+      <p>Multiple channels feed one conversation. A GitHub PR comment and a Slack message sit side by side in the agent's context. Set <code>session_mode: agent-shared</code>.</p>
+    </div>
+    <div class="card">
+      <span class="kicker">Level 2</span>
+      <h5>Same agent, separate sessions</h5>
+      <p>One workspace, one memory, one personality — but independent conversation threads per chat. The common personal setup. Set <code>session_mode: shared</code>.</p>
+    </div>
+    <div class="card">
+      <span class="kicker">Level 3</span>
+      <h5>Separate agent groups</h5>
+      <p>Nothing shared. Different memory, different personality, different container. The right answer whenever different <em>people</em> are involved.</p>
+    </div>
+  </div>
+
+  <div class="tbl">
+  <table>
+    <thead><tr><th>Scenario</th><th>Level</th></tr></thead>
+    <tbody>
+      <tr><td>Just you, across Telegram + Discord + Slack</td><td>Same agent, separate sessions</td></tr>
+      <tr><td>Just you, three Telegram chats for three projects</td><td>Same agent, separate sessions</td></tr>
+      <tr><td>GitHub webhooks paired with the team Slack channel</td><td>Shared session</td></tr>
+      <tr><td>A chat with friend A and a chat with friend B</td><td>Separate agent groups</td></tr>
+      <tr><td>Personal channel and work channel</td><td>Separate agent groups</td></tr>
+      <tr><td>Team channel where members have different access</td><td>Separate agent groups</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="warn">
+    <b>Memory cross-pollinates</b>
+    <p>Levels 1 and 2 share the same <code>memory/</code> tree. Something learned in one chat can surface in another. If there is a confidentiality boundary between two channels, that boundary must be a <em>separate agent group</em>.</p>
+  </div>
+
+  <h3>Engagement: when does the agent speak?</h3>
+  <div class="tbl">
+  <table>
+    <thead><tr><th>Setting</th><th>Values</th><th>Meaning</th></tr></thead>
+    <tbody>
+      <tr><td><code>engage_mode</code></td><td><code>mention</code></td><td>Only when @mentioned, or always in a DM. Default.</td></tr>
+      <tr><td></td><td><code>mention-sticky</code></td><td>Once mentioned in a thread, it subscribes and answers everything after, no repeat mention needed.</td></tr>
+      <tr><td></td><td><code>pattern</code></td><td>Every message is tested against <code>engage_pattern</code>. Use <code>"."</code> for always-on.</td></tr>
+      <tr><td><code>sender_scope</code></td><td><code>all</code> / <code>known</code></td><td><code>known</code> restricts to users with a role or membership in this agent group.</td></tr>
+      <tr><td><code>ignored_message_policy</code></td><td><code>drop</code> / <code>accumulate</code></td><td><code>accumulate</code> stores non-triggering messages as background context so the agent has history when it is finally called.</td></tr>
+      <tr><td><code>session_mode</code></td><td><code>shared</code> / <code>per-thread</code> / <code>agent-shared</code></td><td>Threaded adapters in group chats force per-thread regardless.</td></tr>
+      <tr><td><code>threads</code></td><td><code>true</code> / <code>false</code> / unset</td><td>Per-wiring override. Can disable threads on a threaded platform; never enable them on one without threads.</td></tr>
+      <tr><td><code>priority</code></td><td>number</td><td>Fanout order when several agents are wired to one chat. Higher first.</td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<!-- ============================== 06 ============================== -->
+<section id="personality">
+  <span class="h2-num">Part 06</span>
+  <h2>Personality, memory, and customization</h2>
+  <p class="h2-sub">Three different files, three different jobs. Editing the wrong one is the most common mistake.</p>
+
+  <div class="tbl">
+  <table>
+    <thead><tr><th>What you want to change</th><th>Where it goes</th><th>Approval?</th></tr></thead>
+    <tbody>
+      <tr><td>Role, tone, standing behavior rules</td><td><code>groups/&lt;folder&gt;/instructions.prepend.md</code></td><td><span class="pill open">none</span></td></tr>
+      <tr><td>Durable facts, people, projects, decisions</td><td><code>groups/&lt;folder&gt;/memory/</code></td><td><span class="pill open">none</span></td></tr>
+      <tr><td>Model, effort, assistant name, timezone, CLI scope</td><td><code>ncl groups config update</code></td><td><span class="pill approval">admin</span></td></tr>
+      <tr><td>System / npm packages inside the container</td><td><code>install_packages</code> or <code>ncl groups config add-package</code></td><td><span class="pill approval">admin</span></td></tr>
+      <tr><td>MCP tool servers</td><td><code>add_mcp_server</code> or <code>ncl groups config add-mcp-server</code></td><td><span class="pill approval">admin</span></td></tr>
+      <tr><td>Host directories the agent can see</td><td><code>ncl groups config add-mount</code></td><td><span class="pill host">operator only</span></td></tr>
+      <tr><td>NanoClaw's own source code</td><td>Claude Code on the host, or a builder sub-agent</td><td>you review the diff</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="warn">
+    <b>Never edit <code>groups/&lt;folder&gt;/CLAUDE.md</code></b>
+    <p>It is composed from scratch on every container spawn — from the shared base, your skill fragments, your MCP server fragments, and <code>instructions.prepend.md</code>. Your edits will be silently overwritten. Put standing instructions in <code>instructions.prepend.md</code>, which is imported <em>first</em>, at the top of the composed system prompt.</p>
+  </div>
+
+  <h3>Setting a personality</h3>
+  <p>Just tell the agent, in chat: <em>"From now on, be terse. No preamble, no summaries. If I ask a yes/no question, lead with the answer."</em> It writes that into its own <code>instructions.prepend.md</code>, and it holds from the next turn onward.</p>
+
+  <p>To do it by hand, or to seed a new agent:</p>
+<pre><code>cat &gt; groups/andy/instructions.prepend.md &lt;&lt;'EOF'
+You are Andy, Max's operations assistant.
+
+## Voice
+Direct and brief. No preamble. Lead with the answer, then the reasoning
+only if it changes what Max should do.
+
+## Standing rules
+- Never send more than 5 lines to Telegram without being asked to expand.
+- Money figures always carry the currency and the as-of date.
+- When you are unsure, say so in one sentence and propose the check.
+EOF</code></pre>
+
+  <h3>How memory works</h3>
+  <p>Memory is plain Markdown on your disk. No database, no embedding store. It survives container restarts, session ends, context compaction, and switching the agent to a different model provider.</p>
+
+<pre><code>groups/&lt;folder&gt;/memory/
+├── index.md              <span class="c"># Core Memory + a map of everything else — ALWAYS loaded</span>
+└── system/
+    ├── index.md          <span class="c"># folder index</span>
+    └── definition.md     <span class="c"># how this agent's memory behaves — ALWAYS loaded</span></code></pre>
+
+  <p>Whenever the provider opens a fresh context window — at startup, after a clear, after compaction — a session-start hook injects <code>index.md</code> and <code>system/definition.md</code>, each capped at 16k characters. Everything deeper is reached by following links from the index. That keeps the always-loaded footprint small no matter how big memory gets.</p>
+
+  <p>The tree is an <strong>Open Knowledge Format (OKF) v0.1</strong> bundle: one concept per file, YAML frontmatter declaring a <code>type</code> (<code>person</code>, <code>project</code>, <code>decision</code> — the agent's own vocabulary, not a fixed list). Malformed frontmatter still works; the agent repairs it when it next touches the file. The payoff is portability across providers and tools.</p>
+
+  <div class="tip">
+    <b>Operator moves</b>
+    <p>Read or edit any memory file directly on the host — changes are picked up on the next context window. A wrong fact is just wrong text: delete it, or tell the agent it was wrong and let it prune. To carry memory across a provider switch, run <code>/migrate-memory</code>.</p>
+  </div>
+
+  <h3>Container configuration</h3>
+<pre><code>ncl groups config get --id &lt;group-id&gt;
+
+ncl groups config update --id &lt;group-id&gt; \
+  --model claude-opus-5 \
+  --effort high \
+  --assistant-name <span class="k">"Andy"</span> \
+  --timezone <span class="k">"Europe/Lisbon"</span> \
+  --max-messages-per-prompt 40 \
+  --cli-scope group</code></pre>
+
+  <p>Config changes are saved but do <strong>not</strong> take effect until the container restarts:</p>
+<pre><code>ncl groups restart --id &lt;group-id&gt;
+ncl groups restart --id &lt;group-id&gt; --rebuild --message <span class="k">"ffmpeg is installed — verify it and tell Max."</span></code></pre>
+  <p><code>--rebuild</code> rebuilds the image first and is required after package changes. <code>--message</code> queues an instruction the <em>fresh</em> container acts on when it boots; without it, the container simply stops and comes back on the next user message.</p>
+
+  <h4>What <code>cli_scope</code> controls</h4>
+  <div class="tbl">
+  <table>
+    <thead><tr><th>Value</th><th>What the agent can do with <code>ncl</code></th></tr></thead>
+    <tbody>
+      <tr><td><code>disabled</code></td><td>Never learns <code>ncl</code> exists — the instructions are excluded from its prompt, and the host rejects any request.</td></tr>
+      <tr><td><code>group</code> <em>(default)</em></td><td>Only <code>groups</code>, <code>sessions</code>, <code>destinations</code>, <code>members</code>, <code>tasks</code>, scoped to its own agent group. <code>--id</code> and group args are auto-filled; cross-group access is rejected; it cannot change its own <code>cli_scope</code>.</td></tr>
+      <tr><td><code>global</code></td><td>Unrestricted. Set automatically for the owner's agent by <code>init-first-agent</code>.</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3>Timezones</h3>
+  <p>Each agent group can override the install-wide timezone. It grounds that group's cron interpretation, <code>--process-after</code> parsing, and run-log stamps immediately; the container's <code>TZ</code> follows on the next respawn.</p>
+<pre><code>ncl groups config update --id &lt;group-id&gt; --timezone <span class="k">"Asia/Tokyo"</span>
+ncl groups config update --id &lt;group-id&gt; --timezone <span class="k">""</span>   <span class="c"># back to the install default</span></code></pre>
+
+  <h3>Agent templates</h3>
+  <p>A template is a folder you stamp into a working agent: standing instructions, MCP servers, skills, and optional paused recurring tasks — but never secrets and never a provider.</p>
+<pre><code>ncl groups create --template sales/sdr --name <span class="k">"SDR Agent"</span></code></pre>
+  <p>Templates resolve <strong>only</strong> from a local directory: <code>templates/</code> by default, or <code>NANOCLAW_TEMPLATES_DIR</code>. There is no git URL, no remote fetch, and <code>../</code> escapes are rejected. To use a community template, copy it into <code>templates/</code> yourself first. Stamping does not wire a channel — do that afterward.</p>
+
+  <h3>The other route: change the code</h3>
+  <p>NanoClaw deliberately has no configuration files for behavior. If you want different behavior, you edit the code, and the codebase is small enough that this is safe. From Claude Code in your checkout:</p>
+  <ul>
+    <li><code>/customize</code> — guided changes: new capabilities, trigger words, behavior</li>
+    <li><code>/learn</code> — distill a repeatable workflow into a reusable skill</li>
+    <li><code>/update-nanoclaw</code> — bring upstream changes into a customized fork without a merge nightmare</li>
+    <li><code>/update-skills</code> — re-apply installed skills to pull their latest upstream code</li>
+  </ul>
+</section>
+
+<!-- ============================== 07 ============================== -->
+<section id="agents">
+  <span class="h2-num">Part 07</span>
+  <h2>Sub-agents and multi-agent setups</h2>
+  <p class="h2-sub">Two different mechanisms with the same word attached. Picking the wrong one is the difference between a clean delegation and a container that never goes away.</p>
+
+  <div class="compare">
+    <div class="yes">
+      <h5>SDK sub-agent — stateless</h5>
+      <ul>
+        <li>The agent's built-in <code>Agent</code> tool, inside its own container</li>
+        <li>Spins up, completes, returns, disappears</li>
+        <li>No workspace, no memory, no footprint</li>
+        <li>Blocks the turn until it finishes</li>
+        <li><strong>Use for:</strong> one-off lookups, parallel searches, anything that ends before the user's next message</li>
+      </ul>
+    </div>
+    <div class="no">
+      <h5><code>create_agent</code> — persistent</h5>
+      <ul>
+        <li>A whole new agent group: its own container, workspace, memory, personality</li>
+        <li>Lives indefinitely until you delete it</li>
+        <li>Bidirectional addressable destination on both sides</li>
+        <li>Fire-and-forget — the call returns before the agent is up</li>
+        <li><strong>Use for:</strong> companions that accumulate context, collaborators that work independently and report back</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>Creating a persistent agent</h3>
+  <p>From inside a container, the agent calls the MCP tool:</p>
+<pre><code>mcp__nanoclaw__create_agent({
+  name: <span class="k">"Researcher"</span>,
+  instructions: <span class="k">"You are a research agent working for Andy. Andy sends you "</span> +
+                <span class="k">"open questions. Work independently, cite sources, and report "</span> +
+                <span class="k">"back with send_message({ to: 'parent' }) only when you have "</span> +
+                <span class="k">"a conclusion — not with progress updates."</span>
+})</code></pre>
+
+  <p>What happens: a new agent group is created with its own folder under <code>groups/</code>; your <code>instructions</code> string becomes its <code>instructions.prepend.md</code>; and two destination rows are written, so the parent addresses the child by name and the child addresses the parent as <code>parent</code>. The child inherits the parent's <em>effective</em> provider, not the instance default — a child is never spawned on a runtime the parent cannot reach.</p>
+
+  <div class="warn">
+    <b>This is host-side privileged</b>
+    <p><code>create_agent</code> writes to the central DB and scaffolds host filesystem state — something a confined container is otherwise architecturally barred from. Authorization is enforced on the <em>host</em>, not in the container: only a trusted <code>global</code>-scope group is allowed through directly. Everything else — including unknown config, which fails closed — is held for admin approval, and you get a card naming the requesting agent and the proposed child.</p>
+  </div>
+
+  <p>From the host, the same thing without the MCP layer:</p>
+<pre><code>ncl groups create --folder researcher --name <span class="k">"Researcher"</span>
+ncl destinations add --agent-group-id &lt;parent-id&gt; --local-name researcher \
+  --target-type agent --target-id &lt;child-id&gt;
+ncl destinations add --agent-group-id &lt;child-id&gt; --local-name parent \
+  --target-type agent --target-id &lt;parent-id&gt;</code></pre>
+
+  <h3>Destinations are the ACL</h3>
+  <p>An agent can only send to a target it has a destination row for. There is no ambient "send to anyone". The <code>local_name</code> is scoped to the sending agent, so two agents can call the same target different things.</p>
+<pre><code>ncl destinations list --agent-group-id &lt;group-id&gt;
+ncl destinations add --agent-group-id &lt;id&gt; --local-name ops-slack \
+  --target-type channel --target-id &lt;messaging-group-id&gt;
+ncl destinations remove --agent-group-id &lt;id&gt; --local-name ops-slack</code></pre>
+  <p>Wiring a channel creates the companion destination row automatically and projects it into any running container, so a new chat works without a restart. If an agent's reply is silently dropped as "unknown destination", a missing destination row is the first thing to check.</p>
+
+  <h3>Gating agent-to-agent traffic</h3>
+  <p>You can require a human to approve every message from one agent to another, without unwiring them. Policies are directed and per-pair — gate both directions with two rows. This is operator-only; agents cannot manage their own gates.</p>
+<pre><code>ncl policies set --from &lt;child-id&gt; --to &lt;parent-id&gt; --approver telegram:6037840640
+ncl policies list
+ncl policies remove --from &lt;child-id&gt; --to &lt;parent-id&gt;</code></pre>
+
+  <h3>A worked multi-agent shape</h3>
+  <div class="grid c3">
+    <div class="card">
+      <span class="kicker">Front</span>
+      <h5>Andy</h5>
+      <p>Wired to your Telegram DM. Holds the relationship and the memory. Delegates rather than doing long work inline.</p>
+    </div>
+    <div class="card">
+      <span class="kicker">Worker</span>
+      <h5>Builder</h5>
+      <p>No channel wiring at all. Reachable only from Andy. Makes code changes under strict diff limits and reports back.</p>
+    </div>
+    <div class="card">
+      <span class="kicker">Worker</span>
+      <h5>Researcher</h5>
+      <p>Owns its own long-running inquiry and its own memory. Runs its own scheduled sweeps and pushes findings to <code>parent</code>.</p>
+    </div>
+  </div>
+  <p>The <code>self-customize</code> container skill ships a ready-made builder-agent prompt with the guardrails that make this work in practice: minimal scope, read before writing, hard diff-size limits (reject anything over 200 new or 150 modified lines in one task), no commits, no secrets, and an explicit report of what changed. The limits are the point — 150 lines is reviewable by a human; 500 is not.</p>
+</section>
+
+<!-- ============================== 08 ============================== -->
+<section id="tasks">
+  <span class="h2-num">Part 08</span>
+  <h2>Scheduled tasks</h2>
+  <p class="h2-sub">The feature that turns an assistant into a colleague. Tasks run in their own system session, separate from any chat.</p>
+
+  <h3>Creating a task</h3>
+  <p>A task needs a <code>--prompt</code> plus <strong>either</strong> <code>--recurrence</code> (recurring) <strong>or</strong> <code>--process-after</code> (one-shot). Always pass <code>--name</code> so the id is readable.</p>
+
+<pre><span class="pre-label">Recurring — the first run comes off the cron grid</span><code>ncl tasks create --group &lt;group-id&gt; \
+  --name <span class="k">"weekday briefing"</span> \
+  --recurrence <span class="k">"0 9 * * 1-5"</span> \
+  --prompt <span class="k">"Compile the weekday briefing and send it to telegram"</span></code></pre>
+
+<pre><span class="pre-label">One-shot — --process-after required</span><code>ncl tasks create --group &lt;group-id&gt; \
+  --name <span class="k">"call reminder"</span> \
+  --process-after <span class="k">"2026-09-14T18:00:00+03:00"</span> \
+  --prompt <span class="k">"Remind me to call Dana"</span></code></pre>
+
+  <p>Inside a container, <code>--group</code> is auto-filled. Cron expressions and naive local timestamps are interpreted in the owning group's timezone (its override, else the install default). Task ids become <code>&lt;slug&gt;-&lt;hex&gt;</code>, e.g. <code>weekday-briefing-a25c</code>.</p>
+
+  <div class="note">
+    <b>A task has no chat attached to it</b>
+    <p>If its output should reach a human, the <em>prompt</em> must say where to send it, using a destination name that agent actually has — <code>telegram</code>, <code>ops-slack</code>, <code>parent</code>. A task whose prompt just says "summarize the news" produces a summary that goes nowhere but the run log.</p>
+  </div>
+
+  <h3>Reviewing tasks and their history</h3>
+  <p>A task series behaves like a cron job: the live pending row is the next run, and the completed rows are its history. <code>list</code> renders that as a run-history table.</p>
+
+<pre><code>ncl tasks list                              <span class="c"># all groups (host default)</span>
+ncl tasks list --group &lt;group-id&gt;
+ncl tasks list --status paused
+ncl tasks get weekday-briefing-a25c         <span class="c"># full prompt, script, run counts, recent log</span></code></pre>
+
+  <p><code>list</code> gives you, per series: schedule, run count, failed runs, last fire, next fire, and a pointer to the run log. <code>get</code> adds the full prompt, the gate script, the origin session, and the last ~10 run-log lines.</p>
+
+  <p>Run logs are Markdown files under the agent's own workspace at <code>groups/&lt;folder&gt;/tasks/&lt;series-id&gt;.md</code> — readable directly on the host. Every run auto-logs its final text; the agent can add mid-run notes:</p>
+<pre><code>ncl tasks append-log --msg <span class="k">"one feed returned 403; continuing with the rest"</span></code></pre>
+  <p>Inside a task run the series id is derived from the session, so the agent only supplies <code>--msg</code>. This writes a log line — it sends nothing to anyone.</p>
+
+  <h3>Managing tasks</h3>
+  <div class="tbl">
+  <table>
+    <thead><tr><th>Command</th><th>Effect</th></tr></thead>
+    <tbody>
+      <tr><td><code>ncl tasks run &lt;id&gt;</code></td><td>Fire one extra run now. Does <em>not</em> consume a one-shot or advance a recurring series — the safe way to test. Works while paused.</td></tr>
+      <tr><td><code>ncl tasks pause &lt;id&gt;</code></td><td>Stop firing; keep the series.</td></tr>
+      <tr><td><code>ncl tasks resume &lt;id&gt;</code></td><td>Resume a paused series.</td></tr>
+      <tr><td><code>ncl tasks update &lt;id&gt;</code></td><td>Change <code>--prompt</code>, <code>--recurrence</code>, <code>--process-after</code>, or <code>--script</code>. Pass <code>"null"</code> or <code>"none"</code> to clear recurrence or script.</td></tr>
+      <tr><td><code>ncl tasks cancel &lt;id&gt;</code></td><td>Stop the live task, keep its history. <code>--all</code> is the kill switch for everything in scope.</td></tr>
+      <tr><td><code>ncl tasks delete &lt;id&gt;</code></td><td>Hard-delete the series <em>and</em> its history. Irreversible.</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3>Script gates — the feature that makes frequent tasks cheap</h3>
+  <p>A task can run a Bash script <strong>before</strong> the agent wakes. The script decides whether waking the model is worth it. A gated fire that finds nothing costs zero tokens.</p>
+
+  <div class="tbl">
+  <table>
+    <thead><tr><th>Contract</th><th>Rule</th></tr></thead>
+    <tbody>
+      <tr><td>Interpreter</td><td>bash</td></tr>
+      <tr><td>Timeout</td><td class="num">30 seconds</td></tr>
+      <tr><td>Output cap</td><td class="num">1 MB</td></tr>
+      <tr><td>Decision</td><td>The <strong>last</strong> stdout line must be <code>{"wakeAgent": &lt;bool&gt;, "data": {...}}</code></td></tr>
+      <tr><td><code>wakeAgent: false</code></td><td>Run is marked handled. Model never called. No tokens.</td></tr>
+      <tr><td><code>wakeAgent: true</code></td><td>Agent wakes with <code>data</code> attached to its prompt.</td></tr>
+      <tr><td>State between runs</td><td>Persist under the group workspace, e.g. <code>/workspace/agent/last-seen-id</code></td></tr>
+    </tbody>
+  </table>
+  </div>
+
+<pre><span class="pre-label">A monitor that only wakes the agent when there is something to say</span><code>ncl tasks create --group &lt;group-id&gt; \
+  --name <span class="k">"alert watch"</span> \
+  --recurrence <span class="k">"*/15 * * * *"</span> \
+  --prompt <span class="k">"Investigate the alerts in the script data and notify me if serious"</span> \
+  --script 'c=$(curl -sf https://example.com/api/alerts | jq length) || exit 0
+echo "{\"wakeAgent\": $([ "$c" -gt 0 ] &amp;&amp; echo true || echo false), \"data\": {\"alerts\": $c}}"'</code></pre>
+
+  <p>Rules that bite if ignored: print the JSON as the very <em>last</em> line, exit 0, keep <code>data</code> small (a summary, not a dump), never prompt for input, and always test with <code>bash -c '&lt;script&gt;'</code> before scheduling.</p>
+
+  <h3>The frequency limit</h3>
+  <div class="warn">
+    <b>Ungated recurring tasks are capped at 4 fires per day</b>
+    <p>Anything more frequent is refused. Two ways through: attach a <code>--script</code> gate (preferred — the gate makes quiet fires free), or pass <code>--dangerously-override-recurrence-limit</code>, which should only be used after a human has explicitly confirmed they understand the token and quota cost.</p>
+  </div>
+
+  <h3>Failure backoff</h3>
+  <p>A script that <em>errors</em> — timeout, nonzero exit, missing decision, invalid JSON — counts as a failed run and backs the series off: 2, 4, 8, 16, 32, then 60 minutes, holding at 60. After <strong>8 consecutive failures</strong> the series auto-pauses with the reason in its run log. Fix the script, test it, then <code>ncl tasks resume &lt;id&gt;</code>.</p>
+  <p>A deliberate <code>wakeAgent: false</code> is a normal successful run and never triggers backoff. <code>ncl tasks get &lt;id&gt;</code> shows <code>failed_runs</code> alongside the log.</p>
+
+  <div class="tip">
+    <b>Talking to it instead</b>
+    <p>You never have to touch the CLI. "Every weekday at 9, send me the sales pipeline overview" creates the task. "Pause the Monday briefing" pauses it. "What tasks do you have running?" lists them. The CLI is what the agent uses underneath — and what you use when you want certainty.</p>
+  </div>
+</section>
+
+<!-- ============================== 09 ============================== -->
+<section id="mcp">
+  <span class="h2-num">Part 09</span>
+  <h2>MCP servers, credentials, and host-side OAuth</h2>
+  <p class="h2-sub">The part with the most moving pieces. The organizing principle: the container never holds a secret.</p>
+
+  <h3>Adding an MCP server</h3>
+  <p>Three routes to the same <code>container_configs.mcp_servers</code> JSON.</p>
+
+<pre><span class="pre-label">1 — from the host, as operator</span><code>ncl groups config add-mcp-server --id &lt;group-id&gt; \
+  --name memory \
+  --command pnpm \
+  --args '["dlx","@modelcontextprotocol/server-memory"]' \
+  --env '{"SOME_FLAG":"1"}'
+
+ncl groups config remove-mcp-server --id &lt;group-id&gt; --name memory
+ncl groups restart --id &lt;group-id&gt;    <span class="c"># REQUIRED — no rebuild needed, bun runs TS directly</span></code></pre>
+
+<pre><span class="pre-label">2 — the agent asks for it (admin approval, then auto-restart)</span><code>add_mcp_server({
+  name: <span class="k">"memory"</span>,
+  command: <span class="k">"pnpm"</span>,
+  args: [<span class="k">"dlx"</span>, <span class="k">"@modelcontextprotocol/server-memory"</span>]
+})</code></pre>
+
+<pre><span class="pre-label">3 — baked into a template, as .mcp.json</span><code>{
+  "mcpServers": {
+    "hubspot": { "command": "npx", "args": ["-y", "@hubspot/mcp-server"] },
+    "exa":     { "command": "npx", "args": ["-y", "exa-mcp-server"] }
+  }
+}</code></pre>
+
+  <p>An MCP server may also ship an <code>instructions</code> field, which is composed into the agent's system prompt as a fragment at spawn time — that is how the agent learns what the tools are for, not just that they exist.</p>
+
+  <div class="note">
+    <b>Restart, not rebuild</b>
+    <p>MCP servers need <code>ncl groups restart</code>. <em>Packages</em> need <code>ncl groups restart --rebuild</code>, because the image itself changes.</p>
+  </div>
+
+  <h3>The credential model</h3>
+  <p>Agents never hold raw API keys. Outbound HTTPS from the container is routed through <strong>OneCLI's Agent Vault</strong>, a proxy running on the host that injects credentials at the proxy boundary, matched by API host, at request time.</p>
+
+<pre><span class="pre-label">What the agent writes — no auth header anywhere</span><code>curl -s "https://api.github.com/user/repos?per_page=10"
+curl -s "https://gmail.googleapis.com/gmail/v1/users/me/messages?maxResults=5"</code></pre>
+
+  <p>Standard clients (curl, fetch, requests, axios, Go's net/http, git) honor <code>HTTPS_PROXY</code> automatically, so this needs no code in the MCP server. The consequences are worth stating plainly: a prompt injection cannot exfiltrate a key the container never had, and revoking access is a vault operation, not a container rebuild.</p>
+
+  <h4>Secret modes</h4>
+  <p>Auto-created vault agents default to <code>all</code> mode — every stored secret whose host pattern matches is injected. If an agent is in <code>selective</code> mode it gets nothing until you assign, which shows up as a <code>401</code> from an API whose credential you know is in the vault.</p>
+<pre><code>onecli agents list                                          <span class="c"># check secretMode</span>
+onecli agents set-secret-mode --id &lt;agent-id&gt; --mode all
+onecli agents set-secrets --id &lt;agent-id&gt; --secret-ids ...  <span class="c"># stay selective</span></code></pre>
+  <p>No container restart is needed — the gateway looks secrets up per request.</p>
+
+  <h3>OAuth2 that has to happen on the host machine</h3>
+  <p>This is the question that trips people up: an OAuth flow needs a browser and a loopback redirect, and the container has neither. NanoClaw's answer is that <strong>OAuth never happens in the container</strong>. There are four host-side paths, in order of preference.</p>
+
+  <div class="grid c2">
+    <div class="card">
+      <span class="kicker">Path 1 · default</span>
+      <h5>Connect it in the OneCLI dashboard</h5>
+      <p>Open <code>http://127.0.0.1:10254</code> in the browser on the host machine and connect the app there. The OAuth round-trip — consent screen, redirect, token exchange, refresh — happens entirely on the host. The container just calls the real API URL and the proxy attaches the token.</p>
+    </div>
+    <div class="card">
+      <span class="kicker">Path 2 · on demand</span>
+      <h5>Let the agent hand you a connect link</h5>
+      <p>Set nothing up first. The agent's first call returns 401/403 with a <code>connect_url</code>. It shows you that link in chat, you open it on the host and authorize, you tell the agent to retry. This is the common path and needs no advance configuration.</p>
+    </div>
+    <div class="card">
+      <span class="kicker">Path 3 · host-run server</span>
+      <h5>Run the MCP server on the host, reach it from the container</h5>
+      <p>When a server genuinely needs host resources — the system keychain, a local desktop app, a loopback OAuth listener — run it on the host and point the container at <code>host.docker.internal</code>. Linux gets <code>--add-host=host.docker.internal:host-gateway</code> automatically. The <code>/add-ollama-tool</code> and <code>/add-atomic-chat-tool</code> skills are working examples of this shape.</p>
+    </div>
+    <div class="card">
+      <span class="kicker">Path 4 · last resort</span>
+      <h5>Mount the host credential directory</h5>
+      <p>Some servers insist on reading a real token file. Mount that one directory read-only, and only that one. This is an operator-only action that a container can never perform for itself.</p>
+    </div>
+  </div>
+
+<pre><span class="pre-label">Path 4 — operator-only, allowlist-gated, restart required</span><code><span class="c"># 1. Allow the root, once, in ~/.config/nanoclaw/mount-allowlist.json</span>
+pnpm exec tsx setup/index.ts --step mounts --force -- --json \
+  '{"allowedRoots":[{"path":"/Users/max/.config/some-tool","allowReadWrite":false}],"blockedPatterns":[]}'
+
+<span class="c"># 2. Mount it into one group, read-only</span>
+ncl groups config add-mount --id &lt;group-id&gt; \
+  --host /Users/max/.config/some-tool \
+  --container /home/node/.config/some-tool --ro
+
+ncl groups restart --id &lt;group-id&gt;</code></pre>
+
+  <div class="warn">
+    <b>Read this before mounting anything under your home directory</b>
+    <p>The blocked-pattern list (<code>.ssh</code>, <code>.aws</code>, <code>.gnupg</code>, …) is checked <strong>once, against the realpath of the mount root, and does not descend</strong>. It stops you from <em>naming</em> one of those paths as a mount. It does nothing about what lives underneath an allowed root. Allowlisting <code>~</code> or <code>~/.config</code> exposes every credential below it regardless of what the blocklist says. Mount the narrowest possible directory, read-only, and prefer any of Paths 1–3 over this one.</p>
+  </div>
+
+  <h4>MCP servers that refuse to boot without an env var</h4>
+  <p>Some servers check for a credential env var at startup even though the real credential should come from the proxy. Put a placeholder there — never a real key.</p>
+<pre><code>{
+  "mcpServers": {
+    "acme": {
+      "command": "npx",
+      "args": ["-y", "@acme/mcp-server"],
+      "env": { "ACME_API_KEY": "onecli-managed" }
+    }
+  }
+}</code></pre>
+  <p>The same convention applies to credential <em>files</em> an MCP server needs on disk: write a stub with <code>"onecli-managed"</code> as every secret value, mode <code>0600</code>. Files containing that marker are managed by OneCLI and must not be edited or deleted. The <code>onecli-gateway</code> container skill teaches the agent this flow, including that it must never ask you for a raw key or invent credential-setup instructions.</p>
+
+  <h3>Human approval on credential use</h3>
+  <p>The vault can <em>hold</em> a credentialed outbound request until a human approves it — enforcement the agent cannot argue its way around, matched on host + method + path. This is a two-sided flow, and both sides must be live:</p>
+  <ul>
+    <li><strong>Server side</strong> decides when to hold. As of <code>onecli@2.2.5</code> this is configurable only through the web UI at <code>http://127.0.0.1:10254</code> — the CLI's <code>rules create --action</code> accepts only <code>block</code> and <code>rate_limit</code>.</li>
+    <li><strong>Host side</strong> routes the hold to a person. NanoClaw registers a long-polling callback and DMs an approver, resolved from the <code>user_roles</code> table in preference order: scoped admins for that agent group → global admins → owners.</li>
+  </ul>
+  <div class="warn">
+    <b>Both halves or neither</b>
+    <p>If approvals are configured in the vault but the NanoClaw host callback is not running, every credentialed call hangs until the gateway times out. If the vault has no rule asking for approval, the callback never fires no matter how it is wired.</p>
+  </div>
+
+  <h3>Anthropic credentials specifically</h3>
+  <p>Setup registers your Anthropic credential (subscription OAuth token or API key) with the vault via <code>claude setup-token</code> on the host. If you would rather manage it in <code>.env</code>, the <code>/use-native-credential-proxy</code> skill opts out of the vault for that one credential. For a one-off experiment against any Claude-compatible endpoint:</p>
+<pre><code>ANTHROPIC_BASE_URL=https://your-api-endpoint.com
+ANTHROPIC_AUTH_TOKEN=your-token-here</code></pre>
+
+  <h3>Choosing a different model provider</h3>
+  <p>Provider is per agent group. Claude is built in; the rest install from the <code>providers</code> branch.</p>
+  <div class="tbl">
+  <table>
+    <thead><tr><th>Skill</th><th>Provider</th><th>Backends</th></tr></thead>
+    <tbody>
+      <tr><td><em>built in</em></td><td><code>claude</code></td><td>Anthropic, via the official Claude Agent SDK</td></tr>
+      <tr><td><code>/add-codex</code></td><td><code>codex</code></td><td>OpenAI Codex app-server; ChatGPT subscription or API key</td></tr>
+      <tr><td><code>/add-opencode</code></td><td><code>opencode</code></td><td>OpenRouter, OpenAI, Google, DeepSeek, and more</td></tr>
+      <tr><td><code>/add-ollama-provider</code></td><td><code>claude</code> + overrides</td><td>Local open-weight models (Ollama speaks the Anthropic API natively)</td></tr>
+    </tbody>
+  </table>
+  </div>
+<pre><code>ncl groups config update --id &lt;group-id&gt; --provider codex
+ncl groups restart --id &lt;group-id&gt;</code></pre>
+  <p>Memory carries across a provider switch — that is what the portable OKF format buys you. Run <code>/migrate-memory</code> if the group still holds legacy provider-specific memory. See <code>docs/provider-migration.md</code> for what survives and how to roll back.</p>
+
+  <div class="note">
+    <b>MCP tool vs. agent provider</b>
+    <p>These are different things and the naming collides. <code>/add-ollama-provider</code> makes a local model <em>be</em> the agent. <code>/add-ollama-tool</code> keeps Claude as the planner and lets it <em>call</em> local models as a tool. Same for <code>/add-codex</code> versus using OpenAI through an MCP server.</p>
+  </div>
+</section>
+
+<!-- ============================== 10 ============================== -->
+<section id="people">
+  <span class="h2-num">Part 10</span>
+  <h2>Onboarding people</h2>
+  <p class="h2-sub">Who may talk to your agent, what happens when a stranger does, and what a new user's first minute looks like.</p>
+
+  <h3>The three tiers</h3>
+  <div class="tbl">
+  <table>
+    <thead><tr><th>Tier</th><th>Scope</th><th>Can do</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Owner</strong></td><td>Always global</td><td>Everything. Approves anything. Cannot be scoped to a group.</td></tr>
+      <tr><td><strong>Admin</strong></td><td>Global, or scoped to one agent group</td><td>Manage groups, approve held actions. Admin on a group implies membership.</td></tr>
+      <tr><td><strong>Member</strong></td><td>One agent group</td><td>Talk to that agent. No privileges. This is the plain access gate.</td></tr>
+      <tr><td><strong>Unknown</strong></td><td>—</td><td>Governed by the chat's <code>unknown_sender_policy</code>.</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+<pre><code><span class="c"># 1. Register the person's platform identity</span>
+ncl users create --id telegram:6037840640 --kind telegram --display-name <span class="k">"Dana"</span>
+
+<span class="c"># 2a. Plain access to one agent</span>
+ncl members add --user telegram:6037840640 --group &lt;agent-group-id&gt;
+
+<span class="c"># 2b. …or admin, scoped to one agent</span>
+ncl roles grant --user telegram:6037840640 --role admin --group &lt;agent-group-id&gt;
+
+<span class="c"># 2c. …or admin everywhere</span>
+ncl roles grant --user telegram:6037840640 --role admin
+
+<span class="c"># Inspect and revoke</span>
+ncl users list
+ncl roles list --agent-group-id &lt;agent-group-id&gt;
+ncl members list --agent-group-id &lt;agent-group-id&gt;
+ncl roles revoke --user telegram:6037840640 --role admin --group &lt;agent-group-id&gt;
+ncl members remove --user telegram:6037840640 --group &lt;agent-group-id&gt;</code></pre>
+
+  <div class="note">
+    <b>Privilege is per person, not per agent</b>
+    <p>There is no "admin agent". <code>ncl roles</code> and the command gate query <code>user_roles</code> directly on the host — there is no environment variable of admin ids and no container-side check to bypass.</p>
+  </div>
+
+  <h3>What happens when a stranger messages your agent</h3>
+  <p>Set per chat, with the default coming from the channel adapter's declaration for that context:</p>
+  <div class="tbl">
+  <table>
+    <thead><tr><th><code>unknown_sender_policy</code></th><th>Behavior</th><th>Use when</th></tr></thead>
+    <tbody>
+      <tr><td><code>strict</code> <em>(fallback default)</em></td><td>Dropped silently. Logged to <code>dropped-messages</code>.</td><td>Private assistant. Almost always right.</td></tr>
+      <tr><td><code>request_approval</code></td><td>An approval card is sent to an admin: allow this sender or not.</td><td>A group chat where new people legitimately join.</td></tr>
+      <tr><td><code>public</code></td><td>Anyone may talk to the agent.</td><td>Rarely. Only for an agent with no private context and a narrow job.</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+<pre><code>ncl messaging-groups update &lt;messaging-group-id&gt; --unknown-sender-policy request_approval
+
+<span class="c"># Who has been turned away, and why</span>
+ncl dropped-messages list
+ncl dropped-messages list --reason no_agent_wired</code></pre>
+
+  <p>Drop reasons are specific and worth knowing: <code>no_agent_wired</code> (no wiring exists), <code>no_agent_engaged</code> (a wiring exists but the engage rules did not fire — usually a missing @mention), <code>unknown_sender_strict</code>, and <code>unknown_sender_request_approval</code>. When someone says "it ignored me", this table names the reason.</p>
+
+  <h3>A new user's first minute</h3>
+  <p>When a channel is first wired, the agent runs its <code>welcome</code> skill. It is deliberately not a feature dump: a short greeting, its name, a signal that it can do a lot, and a question — explore, or jump straight in? If they explore, it reveals capabilities one at a time (memory, spawning agents, scheduled work, research, building things, cards, files, self-extension), each in two to four sentences, with an offer to demo.</p>
+  <p>It always covers two more things before finishing: that sensitive actions require the user's explicit approval, and that the user controls who may talk to it. And it makes the interaction model explicit — <strong>there are no commands</strong>. People just talk.</p>
+
+  <div class="tip">
+    <b>Bootstrapping the very first agent</b>
+    <p>Run <code>/init-first-agent</code> from Claude Code. It resolves your identity on the channel, creates the agent, grants you owner, wires your DM, and triggers the welcome message through the normal delivery path — so a successful welcome also proves the whole pipeline works.</p>
+  </div>
+
+  <h3>Approvals in practice</h3>
+  <p>Privileged actions do not execute and then ask forgiveness. They return <code>approval-pending</code> immediately, a card goes to an approver, and only on approve does the action replay and run — with the approval row carried as the grant, re-running the same checks.</p>
+  <p>Approvers are chosen by preference: scoped admins for the agent group, then global admins, then owners — favoring someone reachable on the same platform the request came from.</p>
+<pre><code>ncl approvals list --status pending
+ncl approvals get &lt;approval-id&gt;</code></pre>
+  <p>Actions that hold: <code>install_packages</code>, <code>add_mcp_server</code>, <code>create_agent</code> from a non-global-scope agent, most <code>ncl</code> writes from inside a container, unknown-sender admission, and any credentialed call your vault rules gate. Notably <em>not</em> held: an agent managing its own group's scheduled tasks.</p>
+</section>
+
+<!-- ============================== 11 ============================== -->
+<section id="ncl">
+  <span class="h2-num">Part 11</span>
+  <h2>The <code>ncl</code> command reference</h2>
+  <p class="h2-sub">Every resource and verb. Filter the table, or run <code>ncl &lt;resource&gt; help &lt;verb&gt;</code> for live per-verb detail with flags and examples.</p>
+
+  <h3>Shape and transport</h3>
+<pre><code>ncl &lt;resource&gt; &lt;verb&gt; [&lt;id&gt;] [--flags]
+ncl &lt;resource&gt; help              <span class="c"># fields, types, enums, verbs</span>
+ncl &lt;resource&gt; help &lt;verb&gt;       <span class="c"># one verb in depth</span>
+ncl help                          <span class="c"># everything available to you</span></code></pre>
+
+  <p>On the host, <code>ncl</code> talks to the running service over a Unix socket at <code>data/cli.sock</code>. Inside a container, the same binary at <code>/usr/local/bin/ncl</code> uses the session DB as transport, subject to <code>cli_scope</code>. If the host CLI is not on your PATH, <code>pnpm run ncl -- &lt;args&gt;</code> is equivalent.</p>
+
+  <h4>Conventions that apply everywhere</h4>
+  <ul>
+    <li>Flags are <code>--hyphen-case</code>; they map to <code>underscore_case</code> DB columns automatically.</li>
+    <li><code>list</code> accepts any non-generated column as an equality filter. Default limit is 200 rows — override with <code>--limit N</code>. Rows come back newest first.</li>
+    <li><code>create</code> is idempotent where a natural key exists — re-running a wiring or messaging-group create returns the existing row instead of erroring.</li>
+    <li>Write verbs called from inside a container return <code>approval-pending</code> immediately. That is not an error; the result arrives later as a system message.</li>
+    <li><span class="pill open">open</span> = no approval · <span class="pill approval">approval</span> = admin must approve · <span class="pill host">host only</span> = never runnable from a container.</li>
+  </ul>
+
+  <div class="filter">
+    <input type="search" id="cmdfilter" placeholder="filter commands…  e.g. task, mcp, restart, mount" aria-label="Filter the command reference">
+    <span class="count" id="cmdcount"></span>
+  </div>
+
+  <div class="tbl">
+  <table id="cmdtable">
+    <thead><tr><th>Command</th><th>Access</th><th>What it does · key flags</th></tr></thead>
+    <tbody>
+      <!-- groups -->
+      <tr><td colspan="3" style="background:var(--surface-2);font-family:var(--mono);font-size:.7rem;letter-spacing:.11em;text-transform:uppercase;color:var(--muted)">groups — agent identities</td></tr>
+      <tr><td><code>ncl groups list</code></td><td><span class="pill open">open</span></td><td>List agent groups. Filters: <code>--name</code>, <code>--folder</code>, <code>--limit</code>.</td></tr>
+      <tr><td><code>ncl groups get &lt;id&gt;</code></td><td><span class="pill open">open</span></td><td>One agent group by id.</td></tr>
+      <tr><td><code>ncl groups create</code></td><td><span class="pill approval">approval</span></td><td>Create the group <em>and</em> its container config. Idempotent on <code>--folder</code>. <code>--folder</code> (slug, immutable), <code>--name</code>, <code>--timezone</code>, <code>--template &lt;ref&gt;</code>.</td></tr>
+      <tr><td><code>ncl groups update &lt;id&gt;</code></td><td><span class="pill approval">approval</span></td><td>Only <code>--name</code> is updatable. <code>folder</code> cannot change after creation.</td></tr>
+      <tr><td><code>ncl groups delete</code></td><td><span class="pill approval">approval</span></td><td>FK-ordered cascade in one transaction: sessions, destinations, approvals, roles, memberships, wirings, container config. Does <em>not</em> kill running containers or delete <code>groups/&lt;folder&gt;/</code> on disk. <code>--id</code>.</td></tr>
+      <tr><td><code>ncl groups restart</code></td><td><span class="pill approval">approval</span></td><td>Kill and respawn containers. <code>--id</code>, <code>--rebuild</code> (image first; needed for packages), <code>--message &lt;text&gt;</code> (on-wake instruction). From a container, <code>--id</code> auto-fills and only that session restarts.</td></tr>
+      <tr><td><code>ncl groups config get</code></td><td><span class="pill open">open</span></td><td>Full container config: provider, model, effort, image tag, assistant name, skills, MCP servers, packages, mounts, CLI scope, timezone. <code>--id</code>.</td></tr>
+      <tr><td><code>ncl groups config update</code></td><td><span class="pill approval">approval</span></td><td><code>--provider</code>, <code>--model</code>, <code>--effort</code>, <code>--image-tag</code>, <code>--assistant-name</code>, <code>--max-messages-per-prompt</code>, <code>--cli-scope</code> (<code>disabled</code>/<code>group</code>/<code>global</code>), <code>--timezone</code> (<code>""</code> clears). Needs a restart.</td></tr>
+      <tr><td><code>ncl groups config add-mcp-server</code></td><td><span class="pill approval">approval</span></td><td><code>--id --name --command</code>, optional <code>--args &lt;json-array&gt;</code>, <code>--env &lt;json-object&gt;</code>. Needs a restart.</td></tr>
+      <tr><td><code>ncl groups config remove-mcp-server</code></td><td><span class="pill approval">approval</span></td><td><code>--id --name</code>. Needs a restart.</td></tr>
+      <tr><td><code>ncl groups config add-package</code></td><td><span class="pill approval">approval</span></td><td><code>--id</code> and <code>--apt &lt;pkg&gt;</code> or <code>--npm &lt;pkg&gt;</code>. Needs <code>restart --rebuild</code>.</td></tr>
+      <tr><td><code>ncl groups config remove-package</code></td><td><span class="pill approval">approval</span></td><td><code>--id</code> and <code>--apt</code> or <code>--npm</code>. Needs <code>restart --rebuild</code>.</td></tr>
+      <tr><td><code>ncl groups config add-mount</code></td><td><span class="pill host">host only</span></td><td>Mount a host directory. <code>--id --host &lt;path&gt; --container &lt;path&gt; [--ro]</code>. Allowlist-gated. Needs a restart.</td></tr>
+      <tr><td><code>ncl groups config remove-mount</code></td><td><span class="pill host">host only</span></td><td><code>--id --host --container</code>. Needs a restart.</td></tr>
+
+      <!-- messaging-groups -->
+      <tr><td colspan="3" style="background:var(--surface-2);font-family:var(--mono);font-size:.7rem;letter-spacing:.11em;text-transform:uppercase;color:var(--muted)">messaging-groups — one chat on one platform</td></tr>
+      <tr><td><code>ncl messaging-groups list</code></td><td><span class="pill open">open</span></td><td>Filters: <code>--channel-type</code>, <code>--platform-id</code>, <code>--instance</code>, <code>--name</code>, <code>--is-group</code>, <code>--unknown-sender-policy</code>.</td></tr>
+      <tr><td><code>ncl messaging-groups get &lt;id&gt;</code></td><td><span class="pill open">open</span></td><td>One chat by id.</td></tr>
+      <tr><td><code>ncl messaging-groups create</code></td><td><span class="pill approval">approval</span></td><td>Required: <code>--channel-type --platform-id</code>. Optional: <code>--instance</code> (defaults to channel type), <code>--name</code>, <code>--is-group 0|1</code>, <code>--unknown-sender-policy strict|request_approval|public</code>.</td></tr>
+      <tr><td><code>ncl messaging-groups update &lt;id&gt;</code></td><td><span class="pill approval">approval</span></td><td><code>--instance</code>, <code>--name</code>, <code>--is-group</code>, <code>--unknown-sender-policy</code>, <code>--denied-at</code>.</td></tr>
+      <tr><td><code>ncl messaging-groups delete &lt;id&gt;</code></td><td><span class="pill approval">approval</span></td><td>Remove the chat registration.</td></tr>
+      <tr><td><code>ncl messaging-groups send</code></td><td><span class="pill approval">approval</span></td><td>Inject a message as if a sender posted it, waking the wired agent. Used to send a welcome on first wire. <code>--channel-type --platform-id --text [--instance --sender-id --sender]</code>.</td></tr>
+
+      <!-- wirings -->
+      <tr><td colspan="3" style="background:var(--surface-2);font-family:var(--mono);font-size:.7rem;letter-spacing:.11em;text-transform:uppercase;color:var(--muted)">wirings — chat ↔ agent, and when it engages</td></tr>
+      <tr><td><code>ncl wirings list</code></td><td><span class="pill open">open</span></td><td>Filter by any engagement column.</td></tr>
+      <tr><td><code>ncl wirings get &lt;id&gt;</code></td><td><span class="pill open">open</span></td><td>Under <code>group</code> CLI scope this always targets the current chat.</td></tr>
+      <tr><td><code>ncl wirings create</code></td><td><span class="pill approval">approval</span></td><td>Identify the chat by <code>--messaging-group-id</code> <em>or</em> <code>--channel-type --platform-id [--instance]</code>; the agent by <code>--agent-group-id</code> <em>or</em> <code>--agent-group &lt;folder&gt;</code>. Then <code>--engage-mode</code>, <code>--engage-pattern</code>, <code>--session-mode</code>, <code>--sender-scope</code>, <code>--ignored-message-policy</code>, <code>--threads</code>, <code>--priority</code>. Idempotent on the pair.</td></tr>
+      <tr><td><code>ncl wirings update &lt;id&gt;</code></td><td><span class="pill approval">approval</span></td><td>Same engagement flags. From a container only <code>engage_mode</code> / <code>engage_pattern</code> may change.</td></tr>
+      <tr><td><code>ncl wirings delete &lt;id&gt;</code></td><td><span class="pill approval">approval</span></td><td>Unwire the chat from the agent.</td></tr>
+
+      <!-- users / roles / members -->
+      <tr><td colspan="3" style="background:var(--surface-2);font-family:var(--mono);font-size:.7rem;letter-spacing:.11em;text-transform:uppercase;color:var(--muted)">users · roles · members — who may do what</td></tr>
+      <tr><td><code>ncl users list</code></td><td><span class="pill open">open</span></td><td>Filters: <code>--id</code>, <code>--kind</code>, <code>--display-name</code>.</td></tr>
+      <tr><td><code>ncl users get &lt;id&gt;</code></td><td><span class="pill open">open</span></td><td>One identity.</td></tr>
+      <tr><td><code>ncl users create</code></td><td><span class="pill approval">approval</span></td><td>Required: <code>--id &lt;channel&gt;:&lt;handle&gt;</code> and <code>--kind</code>. Optional <code>--display-name</code>.</td></tr>
+      <tr><td><code>ncl users update &lt;id&gt;</code></td><td><span class="pill approval">approval</span></td><td>Only <code>--display-name</code>.</td></tr>
+      <tr><td><code>ncl roles list</code></td><td><span class="pill open">open</span></td><td>Filters: <code>--user-id</code>, <code>--role</code>, <code>--agent-group-id</code>.</td></tr>
+      <tr><td><code>ncl roles grant</code></td><td><span class="pill approval">approval</span></td><td><code>--user --role owner|admin [--group &lt;id&gt;]</code>. Owner is always global.</td></tr>
+      <tr><td><code>ncl roles revoke</code></td><td><span class="pill approval">approval</span></td><td><code>--user --role [--group]</code>.</td></tr>
+      <tr><td><code>ncl members list</code></td><td><span class="pill open">open</span></td><td>Filters: <code>--user-id</code>, <code>--agent-group-id</code>.</td></tr>
+      <tr><td><code>ncl members add</code></td><td><span class="pill approval">approval</span></td><td><code>--user --group</code>. Admins and owners are implicitly members.</td></tr>
+      <tr><td><code>ncl members remove</code></td><td><span class="pill approval">approval</span></td><td><code>--user --group</code>.</td></tr>
+
+      <!-- destinations / policies -->
+      <tr><td colspan="3" style="background:var(--surface-2);font-family:var(--mono);font-size:.7rem;letter-spacing:.11em;text-transform:uppercase;color:var(--muted)">destinations · policies — where agents may send</td></tr>
+      <tr><td><code>ncl destinations list</code></td><td><span class="pill open">open</span></td><td>With resolved channel and title labels.</td></tr>
+      <tr><td><code>ncl destinations add</code></td><td><span class="pill approval">approval</span></td><td><code>--agent-group-id --local-name --target-type channel|agent --target-id</code>.</td></tr>
+      <tr><td><code>ncl destinations remove</code></td><td><span class="pill approval">approval</span></td><td><code>--agent-group-id --local-name</code>.</td></tr>
+      <tr><td><code>ncl policies list</code></td><td><span class="pill open">open</span></td><td>Agent-to-agent approval gates. Filters: <code>--from-agent-group-id</code>, <code>--to-agent-group-id</code>.</td></tr>
+      <tr><td><code>ncl policies set</code></td><td><span class="pill approval">approval</span></td><td><code>--from --to --approver &lt;user-id&gt;</code>. Directed; gate both ways with two rows. Operator-only.</td></tr>
+      <tr><td><code>ncl policies remove</code></td><td><span class="pill approval">approval</span></td><td><code>--from --to</code>. Back to free flow.</td></tr>
+
+      <!-- tasks -->
+      <tr><td colspan="3" style="background:var(--surface-2);font-family:var(--mono);font-size:.7rem;letter-spacing:.11em;text-transform:uppercase;color:var(--muted)">tasks — scheduled work (agents manage their own without approval)</td></tr>
+      <tr><td><code>ncl tasks list</code></td><td><span class="pill open">open</span></td><td>Run-history table: schedule, runs, failures, next fire. <code>--status pending|paused</code>, <code>--group</code>, <code>--session</code>, <code>--all</code>.</td></tr>
+      <tr><td><code>ncl tasks get &lt;id&gt;</code></td><td><span class="pill open">open</span></td><td>Full prompt, script, run counts, failed runs, recent run-log lines. <code>--id</code> required.</td></tr>
+      <tr><td><code>ncl tasks create</code></td><td><span class="pill open">open</span></td><td><code>--prompt</code> required, plus <code>--recurrence &lt;cron&gt;</code> <em>or</em> <code>--process-after &lt;time&gt;</code>. Also <code>--name</code>, <code>--script</code>, <code>--group</code>, <code>--dangerously-override-recurrence-limit</code>.</td></tr>
+      <tr><td><code>ncl tasks update &lt;id&gt;</code></td><td><span class="pill open">open</span></td><td><code>--prompt</code>, <code>--process-after</code>, <code>--recurrence</code> (<code>"null"</code> clears), <code>--script</code> (<code>"null"</code> removes).</td></tr>
+      <tr><td><code>ncl tasks run &lt;id&gt;</code></td><td><span class="pill open">open</span></td><td>Fire one extra run now without touching the schedule. Safe test path; works while paused.</td></tr>
+      <tr><td><code>ncl tasks pause &lt;id&gt;</code></td><td><span class="pill open">open</span></td><td>Stop firing, keep the series.</td></tr>
+      <tr><td><code>ncl tasks resume &lt;id&gt;</code></td><td><span class="pill open">open</span></td><td>Resume a paused series.</td></tr>
+      <tr><td><code>ncl tasks cancel &lt;id&gt;</code></td><td><span class="pill open">open</span></td><td>Cancel the live task, keep history. <code>--all</code> is the kill switch.</td></tr>
+      <tr><td><code>ncl tasks delete &lt;id&gt;</code></td><td><span class="pill open">open</span></td><td>Hard-delete the series and all its history.</td></tr>
+      <tr><td><code>ncl tasks append-log</code></td><td><span class="pill open">open</span></td><td><code>--msg</code> required. Writes one host-timestamped line to <code>tasks/&lt;id&gt;.md</code>. A log entry, not a message. <code>--id</code> auto-derives inside a task run.</td></tr>
+
+      <!-- read only -->
+      <tr><td colspan="3" style="background:var(--surface-2);font-family:var(--mono);font-size:.7rem;letter-spacing:.11em;text-transform:uppercase;color:var(--muted)">read-only surfaces</td></tr>
+      <tr><td><code>ncl sessions list</code></td><td><span class="pill open">open</span></td><td>Filters: <code>--agent-group-id</code>, <code>--messaging-group-id</code>, <code>--thread-id</code>, <code>--status active|closed</code>, <code>--container-status running|idle|stopped</code>.</td></tr>
+      <tr><td><code>ncl sessions get &lt;id&gt;</code></td><td><span class="pill open">open</span></td><td>One session.</td></tr>
+      <tr><td><code>ncl approvals list</code></td><td><span class="pill open">open</span></td><td>In-flight approval cards. Filters: <code>--status pending|approved|rejected|expired</code>, <code>--action</code>, <code>--agent-group-id</code>.</td></tr>
+      <tr><td><code>ncl approvals get &lt;id&gt;</code></td><td><span class="pill open">open</span></td><td>One approval, with its payload.</td></tr>
+      <tr><td><code>ncl dropped-messages list</code></td><td><span class="pill open">open</span></td><td>Who was turned away and why. Filters: <code>--reason</code>, <code>--channel-type</code>, <code>--platform-id</code>, <code>--user-id</code>.</td></tr>
+      <tr><td><code>ncl user-dms list</code></td><td><span class="pill open">open</span></td><td>Cold-DM route cache: (user, channel) → messaging group used for DM delivery.</td></tr>
+    </tbody>
+  </table>
+  <p class="noresult" id="nores">No command matches that filter.</p>
+  </div>
+
+  <div class="note">
+    <b>This table is a snapshot; the CLI is the source of truth</b>
+    <p>Verbs and flags are generated from the same declarations that produce <code>ncl &lt;resource&gt; help</code>. When they disagree, believe the CLI — and note that an invalid invocation prints the verb's full usage block with the error, so you rarely need a second round-trip.</p>
+  </div>
+</section>
+
+<!-- ============================== 12 ============================== -->
+<section id="ops">
+  <span class="h2-num">Part 12</span>
+  <h2>Operations and debugging</h2>
+  <p class="h2-sub">There is no dashboard. That is deliberate — the intended debugger is Claude Code with <code>/debug</code>. Here is what it, and you, will look at.</p>
+
+  <h3>Where to look, in order</h3>
+  <div class="tbl">
+  <table>
+    <thead><tr><th>Symptom</th><th>Look here</th></tr></thead>
+    <tbody>
+      <tr><td>Anything at all is wrong</td><td><code>logs/nanoclaw.error.log</code> first — delivery failures, crash-loop backoff, warnings. Then <code>logs/nanoclaw.log</code> for the full routing chain.</td></tr>
+      <tr><td>Install failed</td><td><code>logs/setup.log</code> for the sequence, then the named step's raw log under <code>logs/setup-steps/</code>.</td></tr>
+      <tr><td>Message never reached the agent</td><td><code>messages_in</code> in that session's <code>inbound.db</code>. Empty means routing dropped it — check <code>ncl dropped-messages list</code>.</td></tr>
+      <tr><td>Agent replied but nothing arrived</td><td><code>messages_out</code> in <code>outbound.db</code>. A row there means delivery failed; no row means the agent produced nothing.</td></tr>
+      <tr><td>Reply "disappeared"</td><td>Missing destination row. <code>ncl destinations list --agent-group-id &lt;id&gt;</code> — delivery's ACL drops outbound messages with no matching destination.</td></tr>
+      <tr><td>Container keeps dying</td><td>Container logs are <em>lost</em> on exit (<code>--rm</code>). Reproduce with the host in the foreground: <code>pnpm run dev</code>.</td></tr>
+      <tr><td>Task did not fire</td><td><code>ncl tasks get &lt;id&gt;</code> — check <code>failed_runs</code>, <code>next_run</code>, and whether the series auto-paused after 8 failures.</td></tr>
+      <tr><td>API call returns 401 with a key you know is stored</td><td>The vault agent is in <code>selective</code> secret mode. <code>onecli agents list</code>.</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3>Querying the databases</h3>
+  <p>Use the in-tree wrapper, not the <code>sqlite3</code> CLI — the host setup deliberately avoids depending on that binary, and the wrapper goes through the <code>better-sqlite3</code> dependency setup already installs and verifies. Output matches <code>sqlite3 -list</code>.</p>
+<pre><code>pnpm exec tsx scripts/q.ts data/v2.db <span class="k">"SELECT id, name, folder FROM agent_groups"</span>
+
+pnpm exec tsx scripts/q.ts \
+  data/v2-sessions/&lt;group&gt;/&lt;session&gt;/inbound.db \
+  <span class="k">"SELECT seq, kind, status, substr(content,1,80) FROM messages_in ORDER BY seq DESC LIMIT 20"</span></code></pre>
+  <p>Two invariants worth remembering when reading raw rows: the host writes even <code>seq</code> numbers and the container writes odd ones; and every timestamp written from JS is ISO-8601 UTC with a <code>Z</code>. Anything shown to a human or an agent is rendered in the install (or group) timezone; <code>--json</code>, DB values, and operator logs stay ISO.</p>
+
+  <h3>Resource limits and network lockdown</h3>
+  <p>Containers are unbounded by default so existing workloads do not start getting OOM-killed on upgrade. Opt in through <code>.env</code>:</p>
+<pre><code>CONTAINER_CPU_LIMIT=2
+CONTAINER_MEMORY_LIMIT=8g
+CONTAINER_PIDS_LIMIT=512
+
+<span class="c"># Egress lockdown: the credential gateway becomes the only route out</span>
+NANOCLAW_EGRESS_LOCKDOWN=true</code></pre>
+
+  <h3>Development loop</h3>
+<pre><code>pnpm run dev          <span class="c"># host, foreground, via tsx</span>
+pnpm run build        <span class="c"># compile host TypeScript</span>
+pnpm test             <span class="c"># host tests (vitest)</span>
+pnpm run lint
+
+./container/build.sh  <span class="c"># rebuild the agent image</span>
+
+<span class="c"># The agent-runner is a SEPARATE package tree on Bun — not a pnpm workspace</span>
+<span class="k">cd</span> container/agent-runner &amp;&amp; bun install
+<span class="k">cd</span> container/agent-runner &amp;&amp; bun test
+pnpm exec tsc -p container/agent-runner/tsconfig.json --noEmit</code></pre>
+
+  <div class="warn">
+    <b>Two runtimes, two lockfiles</b>
+    <p>The host runs on Node with pnpm; the agent container runs on Bun. They share no modules — only the session databases. Never run <code>pnpm install</code> inside <code>container/agent-runner/</code>, and never run <code>bun install -g</code> for a CLI the agent invokes (that bypasses the supply-chain policy — pin it in the Dockerfile's pnpm global-install block instead). Container tests import from <code>bun:test</code>, not <code>vitest</code>.</p>
+  </div>
+
+  <h3>Supply chain policy</h3>
+  <p>The host tree sets <code>minimumReleaseAge: 4320</code> (3 days) — a new package version must have existed on npm for three days before pnpm will resolve it. Two lists must never be edited without explicit human sign-off: <code>minimumReleaseAgeExclude</code> (and any entry must pin an exact version, never a range) and <code>onlyBuiltDependencies</code> (build scripts execute arbitrary code at install). CI, automation, and container builds use <code>pnpm install --frozen-lockfile</code>.</p>
+
+  <h3>The skills you will actually reach for</h3>
+  <div class="tbl">
+  <table>
+    <thead><tr><th>Skill</th><th>When</th></tr></thead>
+    <tbody>
+      <tr><td><code>/debug</code></td><td>Container problems, auth failures, "why didn't it answer".</td></tr>
+      <tr><td><code>/customize</code></td><td>Add a capability or change behavior, guided.</td></tr>
+      <tr><td><code>/manage-channels</code></td><td>Wire, rewire, or re-scope a channel, with the isolation decision walked through.</td></tr>
+      <tr><td><code>/manage-mounts</code></td><td>View, add, or remove mount allowlist entries.</td></tr>
+      <tr><td><code>/update-nanoclaw</code></td><td>Pull upstream into a customized fork — preview, selective cherry-pick, low token cost.</td></tr>
+      <tr><td><code>/update-skills</code></td><td>Re-apply installed skills to get their latest upstream code.</td></tr>
+      <tr><td><code>/init-onecli</code></td><td>Install or repair the credential vault; migrate <code>.env</code> credentials into it.</td></tr>
+      <tr><td><code>/migrate-memory</code></td><td>Carry a group's memory across a provider switch, or clean up legacy memory storage.</td></tr>
+      <tr><td><code>/learn</code></td><td>Turn something you just did into a reusable skill.</td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<!-- ============================== 13 ============================== -->
+<section id="usecases">
+  <span class="h2-num">Part 13</span>
+  <h2>What people actually build with it</h2>
+  <p class="h2-sub">Patterns from the project's own examples and from public write-ups.</p>
+
+  <h3>Six patterns worth copying</h3>
+  <div class="grid c2">
+    <div class="card">
+      <span class="kicker">Pattern</span>
+      <h5>The morning brief</h5>
+      <p>A weekday cron task compiles the things you would otherwise check by hand — calendar, pipeline, overnight alerts, a news sweep — and sends one message before you open a laptop. The canonical example: <em>"every Monday at 8am, compile AI developments from Hacker News and TechCrunch and message me a briefing."</em></p>
+    </div>
+    <div class="card">
+      <span class="kicker">Pattern</span>
+      <h5>The gated watcher</h5>
+      <p>A frequent recurrence with a script gate. Runs every 15 minutes, calls the model only when the gate says something changed. This is the pattern that makes real-time monitoring affordable, and it is why the ungated frequency cap exists.</p>
+    </div>
+    <div class="card">
+      <span class="kicker">Pattern</span>
+      <h5>Documentation drift patrol</h5>
+      <p><em>"Review the git history for the past week each Friday and update the README if there's drift."</em> An agent with the repo mounted, a weekly schedule, and permission to open a PR — the kind of maintenance nobody schedules for themselves.</p>
+    </div>
+    <div class="card">
+      <span class="kicker">Pattern</span>
+      <h5>The context-carrying assistant</h5>
+      <p>A single agent across Telegram, Slack, and email at isolation level 2. The value compounds: after a few months it knows your projects, your people, and your preferences, and stops needing to be briefed.</p>
+    </div>
+    <div class="card">
+      <span class="kicker">Pattern</span>
+      <h5>Concept to live URL</h5>
+      <p>Ask for a small web app in chat; the agent writes it, runs a dev server, checks it in a real headless browser, and deploys. <code>/add-vercel</code> installs the CLI and wires credential injection for it.</p>
+    </div>
+    <div class="card">
+      <span class="kicker">Pattern</span>
+      <h5>Team bot with an access list</h5>
+      <p>One agent in one Slack channel, its own workspace, <code>sender_scope: known</code>, and an explicit membership list. Deliberately <em>not</em> sharing an agent group with anyone's personal assistant.</p>
+    </div>
+  </div>
+
+  <h3>Reported in public</h3>
+  <p>Write-ups and coverage describe NanoClaw being used for self-hosted personal assistants, team bots, automated notifications, and privacy-conscious deployments; for CI scripts, data processing, and server workflows; for social-media bots, data-monitoring agents, and scheduled LLM workflows on a VPS; and for small recurring chores like scraping, scheduled backups, and maintenance scripts. The founders of an AI agency have described running their actual business operations on it. The recurring reason people give for choosing it over larger frameworks is the same one the README leads with: a codebase small enough to audit, with OS-level container isolation instead of application-level permission checks.</p>
+
+  <p class="mast-meta" style="margin-top:1.25rem">
+    <span>Sources ↓</span>
+  </p>
+  <ul style="font-size:.9rem">
+    <li><a href="https://docs.nanoclaw.dev/introduction">What is NanoClaw? — official docs</a></li>
+    <li><a href="https://nanoclaw.dev/">nanoclaw.dev</a></li>
+    <li><a href="https://www.forbes.com/sites/gilpress/2026/03/13/dont-trust-ai-agents-says-nanoclaw-now-fully-integrated-with-docker/">Forbes — "Don't Trust AI Agents, Says OpenClaw's Security-First Alternative, NanoClaw"</a></li>
+    <li><a href="https://virtuslab.com/blog/ai/nano-claw-your-personal-ai-butler">VirtusLab — GitHub All-Stars #14: NanoClaw</a></li>
+    <li><a href="https://www.bluehost.com/blog/what-is-nanoclaw/">Bluehost — What is NanoClaw? A Developer's Guide</a></li>
+    <li><a href="https://www.datacamp.com/blog/nanoclaw-vs-openclaw">DataCamp — NanoClaw vs OpenClaw</a> · <a href="https://www.datacamp.com/tutorial/nanoclaw-tutorial">DataCamp — NanoClaw tutorial</a></li>
+    <li><a href="https://jagans.substack.com/p/openclaw-nanoclaw-personal-ai-assistants">Substack — OpenClaw, NanoClaw, Personal AI Assistants and the Skill Economy</a></li>
+    <li><a href="https://www.blog.brightcoding.dev/2026/05/20/nanoclaw-the-secure-ai-assistant-running-in-containers">Bright Coding — The Secure AI Assistant Running in Containers</a></li>
+    <li><a href="https://discord.gg/VDdww8qS42">The NanoClaw Discord</a></li>
+  </ul>
+</section>
+
+<!-- ============================== 14 ============================== -->
+<section id="appendix">
+  <span class="h2-num">Part 14</span>
+  <h2>Appendix</h2>
+
+  <h3>Environment variables (<code>.env</code>)</h3>
+  <p>NanoClaw has no configuration files for <em>behavior</em>. These are install-level knobs only.</p>
+  <div class="tbl">
+  <table>
+    <thead><tr><th>Variable</th><th>Effect</th></tr></thead>
+    <tbody>
+      <tr><td><code>ASSISTANT_NAME</code></td><td>Default assistant name. Defaults to <code>Andy</code>.</td></tr>
+      <tr><td><code>TZ</code></td><td>Install-wide timezone. Groups may override it.</td></tr>
+      <tr><td><code>DEFAULT_AGENT_PROVIDER</code></td><td>Provider stamped onto <em>newly created</em> groups. Existing groups are never retroactively flipped.</td></tr>
+      <tr><td><code>ONECLI_URL</code>, <code>ONECLI_API_KEY</code></td><td>Credential gateway location and key.</td></tr>
+      <tr><td><code>CONTAINER_CPU_LIMIT</code>, <code>CONTAINER_MEMORY_LIMIT</code>, <code>CONTAINER_PIDS_LIMIT</code></td><td>Per-container caps. Empty = unbounded (the default).</td></tr>
+      <tr><td><code>CONTAINER_IMAGE</code>, <code>CONTAINER_IMAGE_BASE</code></td><td>Override the per-checkout image tag.</td></tr>
+      <tr><td><code>NANOCLAW_EGRESS_LOCKDOWN</code>, <code>NANOCLAW_EGRESS_NETWORK</code></td><td>Force all container egress through the credential gateway.</td></tr>
+      <tr><td><code>NANOCLAW_TEMPLATES_DIR</code></td><td>Point the template library at another <em>local</em> directory. Never a URL.</td></tr>
+      <tr><td><code>NANOCLAW_NO_DIAGNOSTICS=1</code></td><td>Turn off anonymous setup diagnostics — the only thing NanoClaw reports.</td></tr>
+      <tr><td><code>INSTALL_CJK_FONTS=true</code></td><td>Include CJK fonts in the agent image (~200 MB). Without them, Chromium screenshots and PDFs containing Chinese/Japanese/Korean text render as empty boxes. Requires a rebuild.</td></tr>
+      <tr><td><code>ANTHROPIC_BASE_URL</code>, <code>ANTHROPIC_AUTH_TOKEN</code></td><td>Point at any Claude API-compatible endpoint, for one-off experiments.</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3>The agent's own tools</h3>
+  <p>What the agent can call from inside its container, beyond the standard file/bash/web toolset:</p>
+  <div class="tbl">
+  <table>
+    <thead><tr><th>Tool</th><th>Purpose</th></tr></thead>
+    <tbody>
+      <tr><td><code>send_message({ to, text })</code></td><td>Send to a named destination. <code>to</code> is always explicit — there is no implicit reply target.</td></tr>
+      <tr><td><code>send_file({ to, path, text?, filename? })</code></td><td>Deliver an artifact — chart, PDF, report — as a real file rather than pasted text.</td></tr>
+      <tr><td><code>edit_message(...)</code></td><td>Edit a message already delivered, where the platform supports it.</td></tr>
+      <tr><td><code>add_reaction({ messageId, emoji })</code></td><td>React to an inbound message by its <code>#N</code> id. Lightweight acknowledgment instead of a noisy reply.</td></tr>
+      <tr><td><code>ask_user_question({ title, question, options, timeout? })</code></td><td>Multiple-choice prompt that <em>blocks the turn</em> until answered or timed out (default 300s).</td></tr>
+      <tr><td><code>send_card({ card, fallbackText? })</code></td><td>Structured card with title, description, nested content, and action buttons. Returns immediately.</td></tr>
+      <tr><td><code>create_agent({ name, instructions })</code></td><td>Spawn a persistent companion or collaborator agent, wired bidirectionally.</td></tr>
+      <tr><td><code>install_packages({ apt, npm, reason })</code></td><td>Request persistent packages. Admin approval; on approve, rebuild + restart happen automatically.</td></tr>
+      <tr><td><code>add_mcp_server({ name, command, args })</code></td><td>Wire a new MCP server into itself. Admin approval; restart, no rebuild.</td></tr>
+      <tr><td><code>ncl …</code></td><td>The admin CLI at <code>/usr/local/bin/ncl</code>, scoped by <code>cli_scope</code>.</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p>The agent also wraps scratch reasoning in <code>&lt;internal&gt;…&lt;/internal&gt;</code> — logged, never sent.</p>
+
+  <h3>Container skills</h3>
+  <p>Loaded inside every agent container from <code>container/skills/</code>:</p>
+  <div class="tbl">
+  <table>
+    <thead><tr><th>Skill</th><th>What it gives the agent</th></tr></thead>
+    <tbody>
+      <tr><td><code>agent-browser</code></td><td>Real headless browsing — read pages, fill forms, take screenshots.</td></tr>
+      <tr><td><code>frontend-engineer</code></td><td>Building and checking web interfaces.</td></tr>
+      <tr><td><code>onecli-gateway</code></td><td>How the credential proxy works, how to recover from 401/403, and to never ask you for a raw key.</td></tr>
+      <tr><td><code>self-customize</code></td><td>The decision tree for changing itself, plus the builder-agent pattern and its diff limits.</td></tr>
+      <tr><td><code>welcome</code></td><td>The first-contact onboarding script for a newly wired channel.</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p>Opt-in extras (<code>vercel-cli</code>, the Slack and WhatsApp formatters) are copied in by the <code>/add-*</code> skill that adds their capability.</p>
+
+  <h3>Deeper reading in this repo</h3>
+  <div class="tbl">
+  <table>
+    <thead><tr><th>Document</th><th>Covers</th></tr></thead>
+    <tbody>
+      <tr><td><code>docs/architecture.md</code></td><td>The full architecture writeup, and the design rules that keep skills from conflicting.</td></tr>
+      <tr><td><code>docs/db.md</code> · <code>db-central.md</code> · <code>db-session.md</code></td><td>The three-DB model, every table, cross-mount rules, seq parity.</td></tr>
+      <tr><td><code>docs/agent-runner-details.md</code></td><td>Provider interface, poll loop, MCP tool internals, media handling, session resume.</td></tr>
+      <tr><td><code>docs/isolation-model.md</code></td><td>The three isolation levels in full.</td></tr>
+      <tr><td><code>docs/scheduled-tasks.md</code></td><td>Tasks, script gates, backoff.</td></tr>
+      <tr><td><code>docs/memory.md</code></td><td>The memory tree and the OKF format.</td></tr>
+      <tr><td><code>docs/templates.md</code></td><td>Authoring and stamping agent templates.</td></tr>
+      <tr><td><code>docs/skills-model.md</code> · <code>skill-guidelines.md</code> · <code>skill-directives.md</code></td><td>Writing skills, the <code>nc:</code> directive grammar, the engine seam.</td></tr>
+      <tr><td><code>docs/build-and-runtime.md</code></td><td>Node/Bun split, lockfiles, image build surface, CI invariants.</td></tr>
+      <tr><td><code>docs/hardened-image.md</code></td><td>Opt in to pulling a prebuilt agent image instead of building locally.</td></tr>
+      <tr><td><code>CONTRIBUTING.md</code></td><td>Read before any PR. Only security fixes, bug fixes, and clear improvements land in trunk — everything else is a skill.</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3>Ten things that will save you an hour</h3>
+  <ol>
+    <li>Config changes need <code>ncl groups restart</code>. Package changes need <code>--rebuild</code> too.</li>
+    <li>Never edit <code>groups/&lt;folder&gt;/CLAUDE.md</code> — it is regenerated every spawn. Use <code>instructions.prepend.md</code>.</li>
+    <li>A scheduled task has no chat. Say where the output goes, in the prompt.</li>
+    <li><code>approval-pending</code> is a normal response, not an error.</li>
+    <li>Container logs vanish on exit. Reproduce with <code>pnpm run dev</code>.</li>
+    <li>"The agent ignored me" is usually <code>engage_mode: mention</code> in a group chat, or a missing membership. Check <code>ncl dropped-messages list</code>.</li>
+    <li>"The reply vanished" is usually a missing destination row.</li>
+    <li>Memory is shared across every session in an agent group. Confidentiality boundaries need separate agent groups.</li>
+    <li>Frequent recurring tasks need a script gate, not an override flag.</li>
+    <li>Mount the narrowest directory you can, read-only. The blocklist only checks the mount root and does not descend.</li>
+  </ol>
+</section>
+
+<footer>
+  <p>Written from the NanoClaw v2 source tree — the <code>ncl</code> reference is generated from the same declarations that produce <code>ncl help</code>. Where this page and the CLI disagree, the CLI is right. · <a href="https://docs.nanoclaw.dev">docs.nanoclaw.dev</a> · <a href="https://github.com/nanocoai/nanoclaw">github.com/nanocoai/nanoclaw</a> · MIT</p>
+</footer>
+
+</div>
+</main>
+</div>
+
+<script>
+(function () {
+  // Scrollspy on the rail
+  var links = Array.prototype.slice.call(document.querySelectorAll('.rail nav a'));
+  var map = {};
+  links.forEach(function (a) {
+    var id = a.getAttribute('href').slice(1);
+    var el = document.getElementById(id);
+    if (el) map[id] = a;
+  });
+  var sections = Object.keys(map).map(function (id) { return document.getElementById(id); });
+
+  if ('IntersectionObserver' in window) {
+    var visible = new Set();
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting) visible.add(e.target.id); else visible.delete(e.target.id);
+      });
+      var first = sections.filter(function (s) { return visible.has(s.id); })[0];
+      if (!first) return;
+      links.forEach(function (a) { a.classList.remove('on'); });
+      map[first.id].classList.add('on');
+    }, { rootMargin: '-10% 0px -70% 0px', threshold: 0 });
+    sections.forEach(function (s) { io.observe(s); });
+  }
+
+  // Command reference filter
+  var input = document.getElementById('cmdfilter');
+  var table = document.getElementById('cmdtable');
+  var count = document.getElementById('cmdcount');
+  var nores = document.getElementById('nores');
+  if (!input || !table) return;
+
+  var rows = Array.prototype.slice.call(table.tBodies[0].rows);
+  var cmdRows = rows.filter(function (r) { return r.cells.length > 1; });
+  var groupRows = rows.filter(function (r) { return r.cells.length === 1; });
+
+  function label(n) { return n + (n === 1 ? ' command' : ' commands'); }
+  count.textContent = label(cmdRows.length);
+
+  input.addEventListener('input', function () {
+    var q = input.value.trim().toLowerCase();
+    var shown = 0;
+    cmdRows.forEach(function (r) {
+      var hit = !q || r.textContent.toLowerCase().indexOf(q) !== -1;
+      r.classList.toggle('hidden', !hit);
+      if (hit) shown++;
+    });
+    // Hide a section header when everything under it is filtered out
+    groupRows.forEach(function (g) {
+      var any = false;
+      var n = g.nextElementSibling;
+      while (n && n.cells.length > 1) {
+        if (!n.classList.contains('hidden')) { any = true; break; }
+        n = n.nextElementSibling;
+      }
+      g.classList.toggle('hidden', !any);
+    });
+    count.textContent = q ? shown + ' of ' + cmdRows.length : label(cmdRows.length);
+    nores.classList.toggle('show', shown === 0);
+  });
+})();
+</script>
+</body>
+</html>
