@@ -143,7 +143,7 @@ function groupMention(platformId: string, text = '@bot hello') {
   };
 }
 
-function dmEvent(platformId: string, text = 'hello') {
+function dmEvent(platformId: string, text = 'hello', senderId = 'owner') {
   return {
     channelType: 'telegram',
     platformId,
@@ -151,7 +151,7 @@ function dmEvent(platformId: string, text = 'hello') {
     message: {
       id: `msg-${Math.random().toString(36).slice(2, 8)}`,
       kind: 'chat' as const,
-      content: JSON.stringify({ senderId: 'stranger', senderName: 'Stranger', text }),
+      content: JSON.stringify({ senderId, senderName: senderId === 'owner' ? 'Owner' : 'Stranger', text }),
       timestamp: now(),
       isMention: true, // DM bridge sets isMention=true
     },
@@ -194,6 +194,32 @@ describe('unknown-channel registration flow', () => {
     expect(deliverMock).toHaveBeenCalledTimes(1);
     const payload = JSON.parse(deliverMock.mock.calls[0][4] as string) as { question: string };
     expect(payload.question).toContain('will respond to all messages');
+    const { getDb } = await import('../../db/connection.js');
+    const count = (getDb().prepare('SELECT COUNT(*) AS c FROM pending_channel_approvals').get() as { c: number }).c;
+    expect(count).toBe(1);
+  });
+
+  it('a DM from a non-owner stranger drops silently — no card, no pending row', async () => {
+    const { routeInbound } = await import('../../router.js');
+    await routeInbound(dmEvent('dm-stranger', 'hello', 'stranger'));
+    await new Promise((r) => setTimeout(r, 10));
+
+    expect(deliverMock).not.toHaveBeenCalled();
+    const { getDb } = await import('../../db/connection.js');
+    const count = (getDb().prepare('SELECT COUNT(*) AS c FROM pending_channel_approvals').get() as { c: number }).c;
+    expect(count).toBe(0);
+    const dropped = getDb()
+      .prepare('SELECT reason FROM unregistered_senders WHERE platform_id = ?')
+      .get('dm-stranger') as { reason: string } | undefined;
+    expect(dropped?.reason).toBe('no_agent_wired');
+  });
+
+  it('a group mention from a non-owner, non-admin sender still delivers a card (unchanged)', async () => {
+    const { routeInbound } = await import('../../router.js');
+    await routeInbound(groupMention('chat-stranger-group'));
+    await new Promise((r) => setTimeout(r, 10));
+
+    expect(deliverMock).toHaveBeenCalledTimes(1);
     const { getDb } = await import('../../db/connection.js');
     const count = (getDb().prepare('SELECT COUNT(*) AS c FROM pending_channel_approvals').get() as { c: number }).c;
     expect(count).toBe(1);
@@ -367,7 +393,11 @@ describe('unknown-channel registration flow', () => {
     const { routeInbound } = await import('../../router.js');
     await routeInbound({
       ...waGroupMention('wa-dm-1'),
-      message: { ...waGroupMention('wa-dm-1').message, isGroup: false },
+      message: {
+        ...waGroupMention('wa-dm-1').message,
+        isGroup: false,
+        content: JSON.stringify({ senderId: 'telegram:owner', senderName: 'Owner', text: '@bot hi' }),
+      },
     });
     await new Promise((r) => setTimeout(r, 10));
 

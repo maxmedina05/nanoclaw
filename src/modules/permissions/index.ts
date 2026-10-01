@@ -53,7 +53,7 @@ import {
   type PendingChannelApproval,
 } from './db/pending-channel-approvals.js';
 import { deletePendingSenderApproval, getPendingSenderApproval } from './db/pending-sender-approvals.js';
-import { hasAdminPrivilege } from './db/user-roles.js';
+import { hasAdminPrivilege, isGlobalAdmin, isOwner } from './db/user-roles.js';
 import { getUser, upsertUser } from './db/users.js';
 import { requestSenderApproval } from './sender-approval.js';
 import { ensureUserDm } from './user-dm.js';
@@ -300,6 +300,27 @@ registerResponseHandler(handleSenderApprovalResponse);
 // ── Unknown-channel registration flow ──
 
 setChannelRequestGate(async (mg, event) => {
+  // DMs are the abuse surface: anyone who finds the bot's handle can DM it
+  // and page the owner with a registration card. Restrict self-service DM
+  // registration to the owner (or a global admin) — a DM from anyone else
+  // stays a silent drop (router already recorded it in dropped_messages);
+  // the owner registers them manually via `ncl` after reviewing
+  // `ncl dropped-messages list`, if they choose to.
+  //
+  // Group mentions are left alone: onboarding the bot into a new group chat
+  // is a rarer, more deliberate act (someone invites/mentions it) and the
+  // card still requires the owner's explicit approval either way.
+  const isGroup = event.message.isGroup ?? mg.is_group === 1;
+  if (!isGroup) {
+    const userId = extractAndUpsertUser(event);
+    if (!userId || !(isOwner(userId) || isGlobalAdmin(userId))) {
+      log.info('Channel registration skipped — DM sender is not owner/admin, requires manual registration', {
+        messagingGroupId: mg.id,
+        userId,
+      });
+      return;
+    }
+  }
   await requestChannelApproval({ messagingGroupId: mg.id, event });
 });
 
