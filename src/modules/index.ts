@@ -26,3 +26,4 @@ import './agent-to-agent/index.js';
 import './self-mod/index.js';
 import './community-portal/index.js';
 import './health/index.js';
+import './transcription/index.js';
