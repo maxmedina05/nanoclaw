@@ -1292,9 +1292,17 @@ export function composeSessionSpec(input: ComposeSessionSpecInput): SessionSpec 
   // The model provider's contribution fills first, the gateway's second — a
   // gateway wins a key collision, the override the old raw-argv append got
   // from Docker's last-wins rule.
+  //
+  // Per-group env (`ncl groups config update --env`) layers last: it is the
+  // operator pointing one group at its own model endpoint (e.g. a local
+  // Ollama proxy) while the rest of the install stays on the cloud API, so it
+  // must win over the install-wide provider and gateway values. It rides this
+  // lane because it carries credential-NAMED keys by design
+  // (ANTHROPIC_AUTH_TOKEN=placeholder); credential VALUES are still refused.
   const contributedEnv: Record<string, string> = {
     ...(contribution.env ?? {}),
     ...(gateway.env ?? {}),
+    ...(containerConfig.env ?? {}),
   };
 
   const hostUid = process.getuid?.();

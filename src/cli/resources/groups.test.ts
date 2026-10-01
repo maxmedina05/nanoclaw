@@ -340,6 +340,46 @@ describe('groups config (host-only)', () => {
     expect(JSON.parse((await getContainerConfig(GID))!.additional_mounts)).toEqual([]);
   });
 
+  it('set-env stores, presents and clears per-group env (host caller)', async () => {
+    const GID = 'ag-env';
+    await createAgentGroup({ id: GID, name: 'e', folder: 'e', agent_provider: null, created_at: now() });
+    await ensureContainerConfig(GID);
+    const env = { ANTHROPIC_BASE_URL: 'http://host.docker.internal:11999', ANTHROPIC_AUTH_TOKEN: 'placeholder' };
+
+    const set = await dispatch(
+      { id: 'e1', command: 'groups-config-set-env', args: { id: GID, env: JSON.stringify(env) } },
+      { caller: 'host' },
+    );
+    expect(set.ok).toBe(true);
+    expect(JSON.parse((await getContainerConfig(GID))!.env!)).toEqual(env);
+
+    const bad = await dispatch(
+      { id: 'e2', command: 'groups-config-set-env', args: { id: GID, env: '{"N":1}' } },
+      { caller: 'host' },
+    );
+    expect(bad.ok).toBe(false);
+
+    const clear = await dispatch(
+      { id: 'e3', command: 'groups-config-set-env', args: { id: GID, env: '' } },
+      { caller: 'host' },
+    );
+    expect(clear.ok).toBe(true);
+    expect(JSON.parse((await getContainerConfig(GID))!.env!)).toBeNull();
+  });
+
+  it('set-env is operator-only: an agent caller is refused', async () => {
+    const GID = 'ag-env-agent';
+    await createAgentGroup({ id: GID, name: 'ea', folder: 'ea', agent_provider: null, created_at: now() });
+    await ensureContainerConfig(GID);
+    const resp = await dispatch(
+      { id: 'e4', command: 'groups-config-set-env', args: { id: GID, env: '{"HTTPS_PROXY":""}' } },
+      { caller: 'agent', sessionId: 's1', agentGroupId: GID, messagingGroupId: 'mg1' },
+    );
+    expect(resp.ok).toBe(false);
+    if (!resp.ok) expect(resp.error.code).toBe('forbidden');
+    expect((await getContainerConfig(GID))!.env ?? null).toBeNull();
+  });
+
   describe("--speed validates against the tiers the group's provider declares", () => {
     const GID = 'ag-speed';
     const speedOf = async (): Promise<string | null> => (await getContainerConfig(GID))!.speed;

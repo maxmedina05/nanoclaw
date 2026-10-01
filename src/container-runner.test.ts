@@ -25,6 +25,8 @@ import {
   watchGatewayAvailability,
 } from './container-runner.js';
 import type { SupervisedHandle } from './drivers/session-events.js';
+import { FIXTURE_POLICY } from './drivers/spec-fixture.js';
+import { validateSpec } from './drivers/types.js';
 import { resetGatewayProvider } from './gateway-providers/index.js';
 import { log } from './log.js';
 import type { VolumeMount } from './providers/provider-container-registry.js';
@@ -182,6 +184,51 @@ describe('composeSessionSpec', () => {
       gateway: { env: { HTTPS_PROXY: 'http://gateway-must-win:15001' } },
     });
     expect(spec.containers[0].contributedEnv?.HTTPS_PROXY).toBe('http://gateway-must-win:15001');
+  });
+
+  describe('per-group env (container_configs.env)', () => {
+    // dm-local's live row: a local Ollama proxy endpoint with a placeholder
+    // token, NO_PROXY so the model host bypasses the gateway, and tuning knobs.
+    const dmLocalEnv = {
+      ANTHROPIC_BASE_URL: 'http://host.docker.internal:11999',
+      ANTHROPIC_AUTH_TOKEN: 'placeholder',
+      NO_PROXY: 'host.docker.internal,100.94.244.54',
+      no_proxy: 'host.docker.internal,100.94.244.54',
+      CLAUDE_CODE_MAX_OUTPUT_TOKENS: '8192',
+      CLAUDE_CODE_AUTO_COMPACT_WINDOW: '20000',
+      CLAUDE_TRANSCRIPT_ROTATE_BYTES: '41000',
+    };
+    const gatewayEnv = {
+      HTTPS_PROXY: 'http://x:token@host.docker.internal:10255',
+      ANTHROPIC_BASE_URL: 'https://gateway-default.example',
+      ANTHROPIC_AUTH_TOKEN: 'gateway-managed',
+    };
+
+    it('layers last on the contributed lane: group values win, gateway-only keys survive', () => {
+      const spec = compose({
+        gateway: { env: gatewayEnv },
+        containerConfig: { ...containerConfig, env: dmLocalEnv },
+      });
+      const env = spec.containers[0].contributedEnv!;
+      expect(env).toMatchObject(dmLocalEnv);
+      expect(env.HTTPS_PROXY).toBe(gatewayEnv.HTTPS_PROXY);
+      expect(spec.containers[0].env.ANTHROPIC_AUTH_TOKEN).toBeUndefined();
+    });
+
+    it('passes admission with the live dm-local row', () => {
+      const spec = compose({
+        gateway: { env: gatewayEnv },
+        containerConfig: { ...containerConfig, env: dmLocalEnv },
+      });
+      expect(() => validateSpec(spec, FIXTURE_POLICY)).not.toThrow();
+    });
+
+    it('still refuses a credential VALUE smuggled in through group env', () => {
+      const spec = compose({
+        containerConfig: { ...containerConfig, env: { ANTHROPIC_API_KEY: 'sk-ant-api03-' + 'a'.repeat(40) } },
+      });
+      expect(() => validateSpec(spec, FIXTURE_POLICY)).toThrow(/credential value/);
+    });
   });
 
   it('gateway mounts merge collision-free, shadowing a composed mount on the same target', () => {

@@ -13,7 +13,7 @@ const SCALAR_COLUMNS = new Set([
   'timezone',
   'speed',
 ]);
-const JSON_COLUMNS = new Set(['skills', 'mcp_servers', 'packages_apt', 'packages_npm', 'additional_mounts']);
+const JSON_COLUMNS = new Set(['skills', 'mcp_servers', 'packages_apt', 'packages_npm', 'additional_mounts', 'env']);
 
 export async function getContainerConfig(agentGroupId: string): Promise<ContainerConfigRow | undefined> {
   return getDb().get<ContainerConfigRow>('SELECT * FROM container_configs WHERE agent_group_id = ?', agentGroupId);
@@ -109,10 +109,10 @@ export async function updateContainerConfigScalars(
   await getDb().run(`UPDATE container_configs SET ${fields.join(', ')} WHERE agent_group_id = @agent_group_id`, values);
 }
 
-/** Overwrite a JSON column wholesale. Used for skills, mcp_servers, packages_*, additional_mounts. */
+/** Overwrite a JSON column wholesale. Used for skills, mcp_servers, packages_*, additional_mounts, env. */
 export async function updateContainerConfigJson(
   agentGroupId: string,
-  column: 'skills' | 'mcp_servers' | 'packages_apt' | 'packages_npm' | 'additional_mounts',
+  column: 'skills' | 'mcp_servers' | 'packages_apt' | 'packages_npm' | 'additional_mounts' | 'env',
   value: unknown,
 ): Promise<void> {
   if (!JSON_COLUMNS.has(column)) throw new Error(`Invalid JSON column: ${column}`);

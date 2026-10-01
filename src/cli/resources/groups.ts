@@ -88,8 +88,31 @@ function presentConfig(row: ContainerConfigRow): Record<string, unknown> {
     additional_mounts: JSON.parse(row.additional_mounts),
     cli_scope: row.cli_scope,
     timezone: row.timezone,
+    env: row.env ? JSON.parse(row.env) : null,
     updated_at: row.updated_at,
   };
+}
+
+/**
+ * Parse a --env flag: undefined = not passed, null = explicit clear (`""`),
+ * otherwise a JSON object of string values.
+ */
+function parseEnvFlag(raw: unknown): Record<string, string> | null | undefined {
+  if (raw === undefined) return undefined;
+  if (raw === '') return null;
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(raw as string);
+  } catch {
+    throw new Error(`--env must be valid JSON (got: ${String(raw)})`);
+  }
+  if (parsed === null || typeof parsed !== 'object' || Array.isArray(parsed)) {
+    throw new Error('--env must be a JSON object');
+  }
+  for (const [k, v] of Object.entries(parsed as Record<string, unknown>)) {
+    if (typeof v !== 'string') throw new Error(`--env: value for "${k}" must be a string`);
+  }
+  return parsed as Record<string, string>;
 }
 
 registerResource({
@@ -591,6 +614,24 @@ registerResource({
           removed: { apt: apt || null, npm: npm || null },
           note: 'Image rebuild required for package changes to take effect.',
         };
+      },
+    },
+    'config set-env': {
+      access: 'approval',
+      hostOnly: true,
+      description:
+        "Set a group's container env overrides. OPERATOR-ONLY — never runnable from inside a container " +
+        "(group env layers over the gateway's proxy settings, so an agent that could set it could route " +
+        'itself around the gateway). Typical use: point one group at its own model endpoint. ' +
+        'Use --id <group-id> --env <json-object of string values>; --env "" clears. Requires `ncl groups restart` to take effect.',
+      handler: async (args) => {
+        const id = args.id as string;
+        if (!id) throw new Error('--id is required');
+        const env = parseEnvFlag(args.env);
+        if (env === undefined) throw new Error('--env is required (JSON object, or "" to clear)');
+        if (!(await getContainerConfig(id))) throw new Error(`No container config for group: ${id}`);
+        await updateContainerConfigJson(id, 'env', env);
+        return presentConfig((await getContainerConfig(id))!);
       },
     },
     'config add-mount': {

@@ -257,6 +257,8 @@ export interface ContainerConfig {
   /** Provider-declared speed tier (`standard` or `fast` for Claude); the group value overrides the install default. */
   speed?: ContainerSpeed;
   timezone?: string;
+  /** Per-group container env overrides; layered last at spawn, so they win over provider and gateway env. */
+  env?: Record<string, string>;
   /** Session isolation tier for the group's containers; absent = the composer's default ('container'). */
   runtimeTier?: 'container' | 'vm';
 }
@@ -383,6 +385,7 @@ export function configFromDb(row: ContainerConfigRow, group: AgentGroup): Contai
     ...speedFields(parseContainerSpeed(row.speed) ?? (FAST_MODE ? 'fast' : undefined)),
     timezone: row.timezone && isValidTimezone(row.timezone) ? row.timezone : undefined,
     runtimeTier: parseRuntimeTier(row.runtime_tier, group.name),
+    env: row.env ? (JSON.parse(row.env) as Record<string, string>) : undefined,
   };
 }
 
