@@ -24,6 +24,7 @@ import './interactive/index.js';
 import './permissions/index.js';
 import './agent-to-agent/index.js';
 import './self-mod/index.js';
+import './dm-registration-gate/index.js';
 import './health/index.js';
 import './transcription/index.js';
 import './community-portal/index.js';
