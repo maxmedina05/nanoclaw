@@ -2,6 +2,10 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 
 import { attachTranscripts, isTranscribable, transcriptionEnabled } from './transcribe.js';
 
+// transcribe.ts also reads WHISPER_* from the install's .env. Isolate the
+// tests from it, or a configured install fails the "unset" cases.
+vi.mock('../../env.js', () => ({ readEnvFile: () => ({}) }));
+
 /**
  * The contract these lock down is fail-open: every failure path must return
  * the original content untouched so routing continues. A regression here
