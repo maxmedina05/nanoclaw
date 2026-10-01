@@ -1,0 +1,12 @@
+[Unit]
+Description=Refresh Zoho WorkDrive access token into OneCLI
+
+[Service]
+Type=oneshot
+WorkingDirectory=/home/medma/nanoclaw-v2
+EnvironmentFile=/home/medma/nanoclaw-v2/.env
+Environment=HOME=/home/medma
+Environment=PATH=/home/medma/.nvm/versions/node/v24.15.0/bin:/usr/local/bin:/usr/bin:/bin:/home/medma/.local/bin
+ExecStart=/home/medma/.local/bin/op run --environment cyg2ad3y2lzmizvwlywvzutpua -- /home/medma/nanoclaw-v2/node_modules/.bin/tsx scripts/zoho-token-refresher.ts
+StandardOutput=append:/home/medma/nanoclaw-v2/logs/zoho-token-refresher.log
+StandardError=append:/home/medma/nanoclaw-v2/logs/zoho-token-refresher.log
