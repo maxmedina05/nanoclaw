@@ -194,7 +194,7 @@ function groupMention(platformId: string, text = '@bot hello') {
   };
 }
 
-function dmEvent(platformId: string, text = 'hello') {
+function dmEvent(platformId: string, text = 'hello', senderId = 'owner') {
   return {
     channelType: 'telegram',
     platformId,
@@ -202,7 +202,7 @@ function dmEvent(platformId: string, text = 'hello') {
     message: {
       id: `msg-${Math.random().toString(36).slice(2, 8)}`,
       kind: 'chat' as const,
-      content: JSON.stringify({ senderId: 'stranger', senderName: 'Stranger', text }),
+      content: JSON.stringify({ senderId, senderName: senderId === 'owner' ? 'Owner' : 'Stranger', text }),
       timestamp: now(),
       isMention: true, // DM bridge sets isMention=true
     },
@@ -305,6 +305,15 @@ describe('unknown-channel registration flow', () => {
     expect(payload.question).toContain(AGENT_ACCESS_SCOPE_WARNING);
     const count = await countRows('SELECT COUNT(*) AS c FROM pending_channel_approvals');
     expect(count).toBe(1);
+  });
+
+  it('a DM from a non-owner stranger drops silently — no card, no pending row', async () => {
+    const { routeInbound } = await import('../../router.js');
+    await routeInbound(dmEvent('dm-stranger', 'hello', 'stranger'));
+    await new Promise((r) => setTimeout(r, 10));
+
+    expect(deliverMock).not.toHaveBeenCalled();
+    expect(await countRows('SELECT COUNT(*) AS c FROM pending_channel_approvals')).toBe(0);
   });
 
   it('dedups a second mention while the card is pending', async () => {
@@ -471,7 +480,11 @@ describe('unknown-channel registration flow', () => {
     await expectAsyncDelivery(() =>
       routeInbound({
         ...waGroupMention('wa-dm-1'),
-        message: { ...waGroupMention('wa-dm-1').message, isGroup: false },
+        message: {
+          ...waGroupMention('wa-dm-1').message,
+          isGroup: false,
+          content: JSON.stringify({ senderId: 'telegram:owner', senderName: 'Owner', text: '@bot hi' }),
+        },
       }),
     );
 
