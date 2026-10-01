@@ -131,30 +131,3 @@ describe('buildSystemPromptAddendum — reading messages', () => {
     expect(prompt).not.toContain('cross-session-context');
   });
 });
-
-describe('buildSystemPromptAddendum — model self-identification', () => {
-  it('reports the configured model and provider when modelInfo is passed', () => {
-    seedDestination('casa', 'Casa', 'whatsapp', 'group-1@g.us');
-
-    const prompt = buildSystemPromptAddendum('Casa', { kind: 'chat' }, { provider: 'claude', model: 'claude-opus-5' });
-
-    expect(prompt).toContain('claude-opus-5');
-    expect(prompt).toContain('provider: `claude`');
-  });
-
-  it('describes an unset model as the provider default', () => {
-    seedDestination('casa', 'Casa', 'whatsapp', 'group-1@g.us');
-
-    const prompt = buildSystemPromptAddendum('Casa', { kind: 'chat' }, { provider: 'claude' });
-
-    expect(prompt).toContain("claude provider's default model");
-  });
-
-  it('omits the model section entirely when modelInfo is not passed', () => {
-    seedDestination('casa', 'Casa', 'whatsapp', 'group-1@g.us');
-
-    const prompt = buildSystemPromptAddendum('Casa');
-
-    expect(prompt).not.toContain('# Your model');
-  });
-});
